@@ -159,13 +159,27 @@ sub auto_set_into {
 }
 
 
+# Note: Heavy hand-optimisation going on here, this is the hotpath
 sub debug_prefixed_lines {
   my $self = shift;
+  my $prefix = $self->log_prefix;
+  my $full_name = $self->full_value_name;
+  my $is_env_debugging = $self->is_env_debugging;
+  # without a full_name, debugging cannot be controlled by packages
+  # and env configuration binds above
+  # so if ENV says "no debugging" then "no debugging is going to happen in this runtime"
+  # -> NOP ;)
+  if ( not defined $full_name and not $is_env_debugging ) {
+      return sub {};
+  }
   return sub {
-    return unless $self->get_debug_value;
+    {
+        no strict 'refs';
+        return unless ${ $full_name };
+    }
     my (@message) = @_;
     for my $line (@message) {
-      *STDERR->print( '[' . $self->log_prefix . '] ' ) if defined $self->log_prefix;
+      *STDERR->print( '[' . $prefix . '] ' ) if defined $prefix;
       *STDERR->print($line);
       *STDERR->print("\n");
     }
@@ -234,33 +248,36 @@ sub _has_value {
 
 
 sub get_debug_value {
-  return $_[0]->is_env_debugging if not defined $_[0]->full_value_name;
+  my $full_name = $_[0]->full_value_name;
+  return $_[0]->is_env_debugging if not defined $full_name;
   return do {
     no strict 'refs';
-    return ${ $_[0]->full_value_name };
+    return ${ $full_name };
   };
 }
 
 
 sub inject_debug_value {
-  return if not defined $_[0]->full_value_name;
+  my $full_name = $_[0]->full_value_name;
+  return if not defined $full_name;
   my $value = $_[0]->is_env_debugging;
   if ( _has_value( $_[0]->into, $_[0]->value_name ) ) {
     $value = $_[0]->get_debug_value;
   }
   return do {
     no strict 'refs';
-    *{ $_[0]->full_value_name } = \$value;
+    *{ $full_name } = \$value;
   };
 }
 
 
 sub inject_debug_sub {
-  return if not defined $_[0]->full_sub_name;
+  my $full_name = $_[0]->full_sub_name;
+  return if not defined $full_name;
   my $debug_sub = $_[0]->debug_sub;
   return do {
     no strict 'refs';
-    *{ $_[0]->full_sub_name } = $debug_sub;
+    *{ $full_name } = $debug_sub;
   };
 }
 
@@ -288,7 +305,7 @@ version 0.1.0
 
 =head2 C<auto_set_into>
 
-This method any plumbing will want to call. 
+This method any plumbing will want to call.
 
     $object->auto_set_into( $number_of_additional_stack_levels );
 
@@ -302,13 +319,13 @@ For instance:
         $object->auto_set_into(1); # needs to be bound to the caller to import->()
     }
 
-Or 
+Or
 
     sub import {
         my ($self, %args ) = @_;
         my $object = ...->new(%args);
         __PACKAGE__->bar($object);
-        
+
     }
     sub bar {
         $_[1]->auto_set_into(2); # skip up to caller of bar, then to caller of import
@@ -316,7 +333,7 @@ Or
 
 And in both these cases, the end user just does:
 
-    package::bar->import( into_level =>  0 ); # inject at this level 
+    package::bar->import( into_level =>  0 ); # inject at this level
 
 =head2 C<debug_prefixed_lines>
 
@@ -332,9 +349,9 @@ and formats them as such:
 The exact prefix used is determined by L<< C<log_prefix>|/log_prefix >>,
 and the prefix will be omitted if C<log_prefix> is not defined.
 
-( Note: this will likely require explict passing of  
+( Note: this will likely require explict passing of
 
-    log_prefix => undef 
+    log_prefix => undef
 
 )
 
@@ -370,15 +387,15 @@ When the name is C<< <10 chars >> it is passed unmodified.
 
 Otherwise, it is tokenised, and all tokens bar the last are reduced to either
 
-=over 4 
+=over 4
 
-=item a - groups of upper case only characters 
+=item a - groups of upper case only characters
 
 =item b - failing case a, single lower case characters.
 
 =back
 
-    Hello -> H 
+    Hello -> H
     HELLO -> HELLO
     DistZilla -> DZ
     mutant -> m
@@ -440,7 +457,7 @@ A C<[]> of C<%ENV> keys that also should trigger debugging on this package.
 
 =head2 C<env_key_prefix_style>
 
-The mechanism for determing the C<prefix> for the C<%ENV> key. 
+The mechanism for determing the C<prefix> for the C<%ENV> key.
 
     'default'
 
@@ -525,7 +542,7 @@ The name of the primary C<%ENV> key that controls debugging of this package.
 
 If unspecified, will be determined by the L<< C<env_key_style>|/env_key_style >>
 
-Usually, this will be something like 
+Usually, this will be something like
 
     <env_key_prefix>_DEBUG
 
@@ -543,7 +560,7 @@ The name of the B<PREFIX> to use for C<%ENV> keys for this package.
 
 If unspecified, will be determined by the L<< C<env_key_prefix_style>|/env_key_prefix_style >>
 
-Usually, this will be something like 
+Usually, this will be something like
 
     <magictranslation(uc(into))>
 
@@ -564,7 +581,7 @@ Generated using L<< C<debug_style>|/debug_style >>
 
 The default style to use for C<log_prefix>.
 
-If un-set, defaults to the value of C<$ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE}> if it exists, 
+If un-set, defaults to the value of C<$ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE}> if it exists,
 or simply C<'short'> if it does not.
 
 See L<< C<log_prefix_styles>|/log_prefix_styles >>
@@ -622,7 +639,7 @@ Uses L<< C<log_prefix_from_package_long>|/log_prefix_from_package_long >>
 
 =head3 C<prefixed_lines>
 
-Uses L<< C<debug_prefixed_lines>|/debug_prefixed_lines >> 
+Uses L<< C<debug_prefixed_lines>|/debug_prefixed_lines >>
 
 =head3 C<verbatim>
 
@@ -636,13 +653,13 @@ Internal minimalist lazy-build w/setter generator
 
     _has $name => $coderef;
 
-is roughly equivalent to L<< C<Moo>|Moo >>'s 
+is roughly equivalent to L<< C<Moo>|Moo >>'s
 
-    has $name => ( 
+    has $name => (
         is => ro =>,
         lazy => 1,
         writer => "set_$name",
-        builder => $coderef 
+        builder => $coderef
     );
 
 C<$coderef> can be a C<string>, in which case it will be bolted
@@ -652,7 +669,7 @@ on slightly more efficiently, using
             the_actual_code_here
     }
 
-Instead of 
+Instead of
 
     *Package::Debug::Object::namehere = $builder
 
