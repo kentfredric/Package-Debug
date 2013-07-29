@@ -305,7 +305,9 @@ Uses L</debug_prefixed_lines>
 
 Uses L</debug_verbatim>
 
-=p_func C<_has>
+=head1 PRIVATE FUNCTIONS
+
+=head2 C<_has>
 
 Internal minimalist lazy-build w/setter generator
 
