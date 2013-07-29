@@ -43,6 +43,8 @@
       },
       "runtime" : {
          "requires" : {
+            "B" : "0",
+            "Scalar::Util" : "0",
             "perl" : "v5.10.0",
             "strict" : "0",
             "warnings" : "0"
@@ -61,18 +63,24 @@
       "Package::Debug" : {
          "file" : "lib/Package/Debug.pm",
          "version" : "v0.1.0"
+      },
+      "Package::Debug::Object" : {
+         "file" : "lib/Package/Debug/Object.pm",
+         "version" : "v0.1.0"
       }
    },
    "release_status" : "stable",
    "version" : "0.1.0",
    "x_BuiltWith" : {
       "modules" : {
+         "B" : "1.42",
          "Dist::Zilla::PluginBundle::Author::KENTNL" : "1.7.4",
          "Dist::Zilla::PluginBundle::Author::KENTNL::Lite" : "NA(possibly not installed)",
          "File::Find" : "1.23",
          "File::Temp" : "0.2301",
          "Module::Build" : "0.4005",
          "Pod::Coverage::TrustPod" : "0.100002",
+         "Scalar::Util" : "1.27",
          "Test::CPAN::Changes" : "0.20",
          "Test::CPAN::Meta" : "0.23",
          "Test::More" : "0.98",

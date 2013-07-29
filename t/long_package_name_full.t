@@ -6,7 +6,8 @@ use Test::More;
 use Test::Output qw(stderr_like);
 
 BEGIN {
-    $ENV{FOO_HAS_A_HUGE_NAME_DEBUG} = 1;
+#    $ENV{FOO_HAS_A_HUGE_NAME_DEBUG} = 1;
+    $Foo::Has::A::Huge::Name::DEBUG  = 1;
     $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE} = 'long';
 }
 

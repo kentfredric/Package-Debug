@@ -7,7 +7,6 @@ use Test::Output qw(stderr_like);
 
 BEGIN {
     $ENV{FOO_DEBUG} = 1;
-    delete $ENV{PACKAGE_DEBUG_ALL};
 }
 
 BEGIN {
