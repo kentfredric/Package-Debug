@@ -290,6 +290,8 @@ version 0.1.0
 
 This method any plumbing will want to call. 
 
+    $object->auto_set_into( $number_of_additional_stack_levels );
+
 Takes a parameter to indicate the expected additional levels of stack will be neeed.
 
 For instance:
@@ -318,6 +320,9 @@ And in both these cases, the end user just does:
 
 =head2 C<debug_prefixed_lines>
 
+    my $code = $object->debug_prefixed_lines;
+    $code->( $message );
+
 This Debug implementation returns a C<DEBUG> sub that treats all arguments as lines of message,
 and formats them as such:
 
@@ -338,15 +343,24 @@ and the prefix will be omitted if C<log_prefix> is not defined.
 This Debug implementation returns a C<DEBUG> sub that simply
 passes all parameters to C<< *STDERR->print >>, as long as debugging is turned on.
 
+    my $code = $object->debug_verbatim;
+    $code->( $message );
+
 =head2 C<env_key_from_package>
 
 This C<env_key_style> simply appends C<_DEBUG> to the C<env_key_prefix>
+
+    my $key = $object->env_key_from_package;
 
 =head2 C<env_key_prefix_from_package>
 
 This L<< C<env_key_prefix_style>|/env_prefix_style >> converts L<< C<into>|/into >> to a useable C<%ENV> name.
 
     Hello::World::Bar -> HELLO_WORLD_BAR
+
+Usage:
+
+    my $prefix = $object->env_key_prefix_from_package;
 
 =head2 C<log_prefix_from_package_short>
 
@@ -374,13 +388,25 @@ And then regrouped and the last attached
     This::Is::A::Test -> T:I:A::Test
     NationalTerrorismStrikeForce::SanDiego::SportsUtilityVehicle -> NTSF:SD::SportsUtilityVehicle
 
+Usage:
+
+    my $prefix = $object->log_prefix_from_package_short;
+
 =head2 C<log_prefix_from_package_long>
 
 This L<< C<log_prefix_style>|/log_prefix_style >> simply returns C<into> as-is.
 
+Usage:
+
+    my $prefix = $object->log_prefix_from_package_long;
+
 =head2 C<get_debug_value>
 
 Returns the "are we debugging right now" value.
+
+    if ( $object->get_debug_value ) {
+        print "DEBUGGING IS ON!"
+    }
 
 =head2 C<inject_debug_value>
 
@@ -388,9 +414,13 @@ Optimistically injects the desired C<$DEBUG> symbol into the package determined 
 
 Preserves the existing value if such a symbol already exists.
 
+    $object->inject_debug_value();
+
 =head2 C<inject_debug_sub>
 
 Injects the desired code reference C<DEBUG> symbol into the package determined by C<full_sub_name>
+
+    $object->inject_debug_sub();
 
 =head1 ATTRIBUTES
 
@@ -639,6 +669,12 @@ This is mostly to facilitate this:
     use Some::Package;
 
 This way, we don't stomp over that value.
+
+Usage:
+
+    if ( _has_value( $package, $variable_name ) ) {
+        ...
+    }
 
 =head1 AUTHOR
 
