@@ -70,14 +70,28 @@ _has env_key_aliases      => q[ []  ];
 
 
 _has env_key_prefix_style => q[ 'default' ];
+
+
 _has env_key_style        => q[ 'default' ];
-_has full_sub_name        => q[ return if not $_[0]->sub_name   ; $_[0]->package . '::' . $_[0]->sub_name   ];
-_has full_value_name      => q[ return if not $_[0]->value_name ; $_[0]->package . '::' . $_[0]->value_name ];
+
+
+_has full_sub_name        => q[ return if not $_[0]->sub_name   ; $_[0]->into . '::' . $_[0]->sub_name   ];
+
+
+_has full_value_name      => q[ return if not $_[0]->value_name ; $_[0]->into . '::' . $_[0]->value_name ];
+
+
 _has into       => q[ die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()' ];
+
+
 _has into_level => q[ 0 ];
-_has package    => q[ $_[0]->into ];
+
+
 _has sub_name   => q[ 'DEBUG' ];
+
+
 _has value_name => q[ 'DEBUG' ];
+
 
 _has env_key => sub {
   my $style = $_[0]->env_key_style;
@@ -88,6 +102,7 @@ _has env_key => sub {
   return $_[0]->$method();
 };
 
+
 _has env_key_prefix => sub {
   my $style = $_[0]->env_key_prefix_style;
   if ( not exists $env_key_prefix_styles{$style} ) {
@@ -96,6 +111,7 @@ _has env_key_prefix => sub {
   my $method = $env_key_prefix_styles{$style};
   return $_[0]->$method();
 };
+
 
 _has debug_sub => sub {
   my $style = $_[0]->debug_style;
@@ -106,10 +122,12 @@ _has debug_sub => sub {
   return $_[0]->$method();
 };
 
+
 _has log_prefix_style => sub {
   return $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE} if $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE};
   return 'short';
 };
+
 
 _has log_prefix => sub {
   my $style = $_[0]->log_prefix_style;
@@ -119,6 +137,7 @@ _has log_prefix => sub {
   my $method = $log_prefix_styles{$style};
   $_[0]->$method();
 };
+
 
 _has is_env_debugging => sub {
   if ( $ENV{PACKAGE_DEBUG_ALL} ) {
@@ -133,10 +152,12 @@ _has is_env_debugging => sub {
   return undef;
 };
 
+
 sub auto_set_into {
   my ( $self, $add ) = @_;
   $_[0]->{into} = [ caller( $self->into_level + $add ) ]->[0];
 }
+
 
 sub debug_prefixed_lines {
   my $self = shift;
@@ -151,18 +172,31 @@ sub debug_prefixed_lines {
   };
 }
 
+
+
+sub debug_verbatim {
+  my $self = shift;
+  return sub {
+    return unless $self->get_debug_value;
+    *STDERR->print(@_);
+  };
+}
+
+
 sub env_key_from_package {
   return $_[0]->env_key_prefix() . '_DEBUG';
 }
 
+
 sub env_key_prefix_from_package {
-  my $package = $_[0]->package;
+  my $package = $_[0]->into;
   $package =~ s/::/_/g;
   return uc($package);
 }
 
+
 sub log_prefix_from_package_short {
-  my $package = $_[0]->package;
+  my $package = $_[0]->into;
   if ( ( length $package ) < 10 ) {
     return $package;
   }
@@ -179,9 +213,11 @@ sub log_prefix_from_package_short {
   return $left . '::' . $last;
 }
 
+
 sub log_prefix_from_package_long {
-  return $_[0]->package;
+  return $_[0]->into;
 }
+
 
 sub _has_value {
   my $ns = do { no strict 'refs'; \%{ $_[0] . '::' } };
@@ -196,6 +232,7 @@ sub _has_value {
   return;
 }
 
+
 sub get_debug_value {
   return $_[0]->is_env_debugging if not defined $_[0]->full_value_name;
   return do {
@@ -204,10 +241,11 @@ sub get_debug_value {
   };
 }
 
+
 sub inject_debug_value {
   return if not defined $_[0]->full_value_name;
   my $value = $_[0]->is_env_debugging;
-  if ( _has_value( $_[0]->package, $_[0]->value_name ) ) {
+  if ( _has_value( $_[0]->into, $_[0]->value_name ) ) {
     $value = $_[0]->get_debug_value;
   }
   return do {
@@ -215,6 +253,7 @@ sub inject_debug_value {
     *{ $_[0]->full_value_name } = \$value;
   };
 }
+
 
 sub inject_debug_sub {
   return if not defined $_[0]->full_sub_name;
@@ -247,6 +286,112 @@ version 0.1.0
 
     my $object = Package::Debug::Object->new(%args);
 
+=head2 C<auto_set_into>
+
+This method any plumbing will want to call. 
+
+Takes a parameter to indicate the expected additional levels of stack will be neeed.
+
+For instance:
+
+    sub import {
+        my ($self, %args ) = @_;
+        my $object = ...->new(%args);
+        $object->auto_set_into(1); # needs to be bound to the caller to import->()
+    }
+
+Or 
+
+    sub import {
+        my ($self, %args ) = @_;
+        my $object = ...->new(%args);
+        __PACKAGE__->bar($object);
+        
+    }
+    sub bar {
+        $_[1]->auto_set_into(2); # skip up to caller of bar, then to caller of import
+    }
+
+And in both these cases, the end user just does:
+
+    package::bar->import( into_level =>  0 ); # inject at this level 
+
+=head2 C<debug_prefixed_lines>
+
+This Debug implementation returns a C<DEBUG> sub that treats all arguments as lines of message,
+and formats them as such:
+
+    [SomePrefix::Goes::Here] this is your messages first line\n
+    [SomePrefix::Goes::Here] this is your messages second line\n
+
+The exact prefix used is determined by L<< C<log_prefix>|/log_prefix >>,
+and the prefix will be omitted if C<log_prefix> is not defined.
+
+( Note: this will likely require explict passing of  
+
+    log_prefix => undef 
+
+)
+
+=head2 C<debug_verbatim>
+
+This Debug implementation returns a C<DEBUG> sub that simply
+passes all parameters to C<< *STDERR->print >>, as long as debugging is turned on.
+
+=head2 C<env_key_from_package>
+
+This C<env_key_style> simply appends C<_DEBUG> to the C<env_key_prefix>
+
+=head2 C<env_key_prefix_from_package>
+
+This L<< C<env_key_prefix_style>|/env_prefix_style >> converts L<< C<into>|/into >> to a useable C<%ENV> name.
+
+    Hello::World::Bar -> HELLO_WORLD_BAR
+
+=head2 C<log_prefix_from_package_short>
+
+This L<< C<log_prefix_style>|/log_prefix_style >> determines a C<short> name by mutating C<into>.
+
+When the name is C<< <10 chars >> it is passed unmodified.
+
+Otherwise, it is tokenised, and all tokens bar the last are reduced to either
+
+=over 4 
+
+=item a - groups of upper case only characters 
+
+=item b - failing case a, single lower case characters.
+
+=back
+
+    Hello -> H 
+    HELLO -> HELLO
+    DistZilla -> DZ
+    mutant -> m
+
+And then regrouped and the last attached
+
+    This::Is::A::Test -> T:I:A::Test
+    NationalTerrorismStrikeForce::SanDiego::SportsUtilityVehicle -> NTSF:SD::SportsUtilityVehicle
+
+=head2 C<log_prefix_from_package_long>
+
+This L<< C<log_prefix_style>|/log_prefix_style >> simply returns C<into> as-is.
+
+=head2 C<get_debug_value>
+
+Returns the "are we debugging right now" value.
+
+=head2 C<inject_debug_value>
+
+Optimistically injects the desired C<$DEBUG> symbol into the package determined by C<full_value_name>.
+
+Preserves the existing value if such a symbol already exists.
+
+=head2 C<inject_debug_sub>
+
+Injects the desired code reference C<DEBUG> symbol into the package determined by C<full_sub_name>
+
 =head1 ATTRIBUTES
 
 =head2 C<debug_style>
@@ -255,21 +400,169 @@ The debug printing style to use.
 
     'prefixed_lines'
 
-See L</debug_styles>
+See L<< C<debug_styles>|/debug_styles >>
 
 =head2 C<env_key_aliases>
 
-A C<[]> of C<$ENV> keys that also should trigger debugging on this package.
+A C<[]> of C<%ENV> keys that also should trigger debugging on this package.
 
     []
 
 =head2 C<env_key_prefix_style>
 
-The mechanism for determing the C<prefix> for the C<$ENV> key. 
+The mechanism for determing the C<prefix> for the C<%ENV> key. 
 
     'default'
 
-See L</env_key_prefix_styles>
+See  L<< C<env_key_prefix_styles>|/env_key_prefix_styles >>
+
+=head2 C<env_key_style>
+
+The mechanism for determining the final C<%ENV> key for turning on debug.
+
+    'default'
+
+See L<< C<env_key_styles>|/env_key_styles >>
+
+=head2 C<full_sub_name>
+
+Fully qualified name of the C<sub> that will be injected to implement debugging.
+
+Default is:
+
+    <into> . '::' . <sub_name>
+
+Or
+
+    undef
+
+If C<sub_name> is C<undef>
+
+See L<< C<into>|/into >> and L<< C<sub_name>|/sub_name >>
+
+=head2 C<full_value_name>
+
+Fully qualified name of the C<value> that will be injected to implement debugging control.
+
+Default is:
+
+    <into> . '::' . <value_name>
+
+Or
+
+    undef
+
+If C<value_name> is C<undef>
+
+See L<< C<into>|/into >> and L<< C<value_name>|/value_name >>
+
+=head2 C<into>
+
+The package we're injecting into.
+
+B<IMPORTANT>: This field cannot vivify itself and be expected to work.
+
+Because much code in this module depends on this field,
+if this field is B<NOT> populated explicity by the user, its likely
+to increase the stack depth, invalidating any value if L<< C<into_level>|/into_level >> that was specified.
+
+See L<< C<auto_set_into>|/auto_set_into >>
+
+=head2 C<into_level>
+
+The number of levels up to look for C<into>
+
+Note, that this value is expected to be provided by a consuming class somewhere, and is expected to be
+simply passed down from a user.
+
+See  L<< C<auto_set_into>|/auto_set_into >> for how to set C<into> sanely.
+
+=head2 C<sub_name>
+
+The name of the C<CODEREF> that will be installed into C<into>
+
+    'DEBUG'
+
+=head2 C<value_name>
+
+The name of the C<$SCALAR> that will be installed into C<into>
+
+    'DEBUG' ## $DEBUG
+
+=head2 C<env_key>
+
+The name of the primary C<%ENV> key that controls debugging of this package.
+
+If unspecified, will be determined by the L<< C<env_key_style>|/env_key_style >>
+
+Usually, this will be something like 
+
+    <env_key_prefix>_DEBUG
+
+And where C<env_key_prefix> is factory,
+
+    <magictranslation(uc(into))>_DEBUG
+
+Aka:
+
+    SOME_PACKAGE_NAME_DEBUG
+
+=head2 C<env_key_prefix>
+
+The name of the B<PREFIX> to use for C<%ENV> keys for this package.
+
+If unspecified, will be determined by the L<< C<env_key_prefix_style>|/env_key_prefix_style >>
+
+Usually, this will be something like 
+
+    <magictranslation(uc(into))>
+
+Aka:
+
+    SOME_PACKAGE_NAME
+
+=head2 C<debug_sub>
+
+The actual code ref to install to do the real debugging work.
+
+This is mostly an implementation detail, but if you were truely insane, you could pass a custom coderef
+to construction, and it would install the coderef you passed instead of the one we generate.
+
+Generated using L<< C<debug_style>|/debug_style >>
+
+=head2 C<log_prefix_style>
+
+The default style to use for C<log_prefix>.
+
+If un-set, defaults to the value of C<$ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE}> if it exists, 
+or simply C<'short'> if it does not.
+
+See L<< C<log_prefix_styles>|/log_prefix_styles >>
+
+=head2 C<log_prefix>
+
+The string to prefix to log messages for debug implementations which use prefixes.
+
+If not specified, will be generated from the style specified by L<< C<log_prefix_style>|/log_prefix_style >>
+
+Which will be usually something like
+
+    Foo::Package::Bar # 'long'
+    F:P::Bar          # 'short'
+
+=head2 C<is_env_debugging>
+
+The determination as to wether or not the C<%ENV> indicates debugging should be enabled.
+
+Will always be C<true> if C<$ENV{PACKAGE_DEBUG_ALL}>
+
+And will be C<true> if either L<< C<env_key>|/env_key >> or one of L<< C<env_key_aliases>|/env_key_aliases >>
+is C<true>.
+
+B<NOTE:> This value I<BINDS> the first time it is evaluated, so for granular control of debugging at runtime,
+you should not be lexically changing C<%ENV>.
+
+Instead, you should be modifying the value of C<$My::Package::Name::DEBUG>
 
 =head1 STYLES
 
@@ -277,33 +570,33 @@ See L</env_key_prefix_styles>
 
 =head3 C<default>
 
-Uses L</env_key_from_package>
+Uses L<< C<env_key_from_package>|/env_key_from_package >>
 
 =head2 C<env_key_prefix_styles>
 
 =head3 C<default>
 
-Uses L</env_key_prefix_from_package>
+Uses L<< C<env_key_prefix_from_package>|/env_key_prefix_from_package >>
 
 =head2 C<log_prefix_styles>
 
 =head3 C<short>
 
-Uses L</log_prefix_from_package_short>
+Uses L<< C<log_prefix_from_package_short>|/log_prefix_from_package_short >>
 
 =head3 C<long>
 
-Uses L</log_prefix_from_package_long>
+Uses L<< C<log_prefix_from_package_long>|/log_prefix_from_package_long >>
 
 =head2 C<debug_styles>
 
 =head3 C<prefixed_lines>
 
-Uses L</debug_prefixed_lines>
+Uses L<< C<debug_prefixed_lines>|/debug_prefixed_lines >> 
 
 =head3 C<verbatim>
 
-Uses L</debug_verbatim>
+Uses L<< C<debug_verbatim>|/debug_verbatim >>
 
 =head1 PRIVATE FUNCTIONS
 
@@ -332,6 +625,20 @@ on slightly more efficiently, using
 Instead of 
 
     *Package::Debug::Object::namehere = $builder
+
+=head2 C<_has_value>
+
+Internal function shredded from guts of L<<< C<< Package::Stash::B<PP> >>|Package::Stash::PP >>>, for the purpose
+of determining if a given package already has a specific value defined or not.
+
+This is mostly to facilitate this:
+
+    BEGIN {
+        $Some::Package::DEBUG = 1;
+    }
+    use Some::Package;
+
+This way, we don't stomp over that value.
 
 =head1 AUTHOR
 
