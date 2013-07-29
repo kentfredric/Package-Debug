@@ -5,23 +5,102 @@ package Package::Debug::Object;
 
 # ABSTRACT: Object oriented guts to Package::Debug
 
+=head1 STYLES
+
+=head2 C<env_key_styles>
+
+=head3 C<default>
+
+Uses L<< C<env_key_from_package>|/env_key_from_package >>
+
+=cut
+
 my %env_key_styles        = ( default => 'env_key_from_package', );
+
+=head2 C<env_key_prefix_styles>
+
+=head3 C<default>
+
+Uses L<< C<env_key_prefix_from_package>|/env_key_prefix_from_package >>
+
+=cut
+
 my %env_key_prefix_styles = ( default => 'env_key_prefix_from_package', );
+
+=head2 C<log_prefix_styles>
+
+=head3 C<short>
+
+Uses L<< C<log_prefix_from_package_short>|/log_prefix_from_package_short >>
+
+=head3 C<long>
+
+Uses L<< C<log_prefix_from_package_long>|/log_prefix_from_package_long >>
+
+=cut
+
 my %log_prefix_styles     = (
   short => 'log_prefix_from_package_short',
   long  => 'log_prefix_from_package_long',
 );
+
+=head2 C<debug_styles>
+
+=head3 C<prefixed_lines>
+
+Uses L<< C<debug_prefixed_lines>|/debug_prefixed_lines >>
+
+=head3 C<verbatim>
+
+Uses L<< C<debug_verbatim>|/debug_verbatim >>
+
+=cut
+
 my %debug_styles = (
   'prefixed_lines' => 'debug_prefixed_lines',
   'verbatim'       => 'debug_verbtaim',
 );
+
+=method C<new>
+
+    my $object = Package::Debug::Object->new(%args);
+
+=cut
 
 sub new {
   my ( $self, %args ) = @_;
   return bless \%args, $self;
 }
 
-sub has {
+=p_func C<_has>
+
+Internal minimalist lazy-build w/setter generator
+
+    _has $name => $coderef;
+
+is roughly equivalent to L<< C<Moo>|Moo >>'s
+
+    has $name => (
+        is => ro =>,
+        lazy => 1,
+        writer => "set_$name",
+        builder => $coderef
+    );
+
+C<$coderef> can be a C<string>, in which case it will be bolted
+on slightly more efficiently, using
+
+    sub Package::Debug::Object::namehere {
+            the_actual_code_here
+    }
+
+Instead of
+
+    *Package::Debug::Object::namehere = $builder
+
+=cut
+
+sub _has {
   my ( $name, $builder ) = @_;
   local $@;
   my $package = __PACKAGE__;
@@ -47,19 +126,161 @@ sub has {
   die "Compiling code << sub { $code } >> failed. $@" if $@;
 }
 
-has debug_style          => q[ 'prefixed_lines' ];
-has env_key_aliases      => q[ []  ];
-has env_key_prefix_style => q[ 'default' ];
-has env_key_style        => q[ 'default' ];
-has full_sub_name        => q[ return if not $_[0]->sub_name   ; $_[0]->package . '::' . $_[0]->sub_name   ];
-has full_value_name      => q[ return if not $_[0]->value_name ; $_[0]->package . '::' . $_[0]->value_name ];
-has into       => q[ die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()' ];
-has into_level => q[ 0 ];
-has package    => q[ $_[0]->into ];
-has sub_name   => q[ 'DEBUG' ];
-has value_name => q[ 'DEBUG' ];
+=attr C<debug_style>
 
-has env_key => sub {
+The debug printing style to use.
+
+    'prefixed_lines'
+
+See L<< C<debug_styles>|/debug_styles >>
+
+=cut
+
+_has debug_style          => q[ 'prefixed_lines' ];
+
+=attr C<env_key_aliases>
+
+A C<[]> of C<%ENV> keys that also should trigger debugging on this package.
+
+    []
+
+=cut
+
+_has env_key_aliases      => q[ []  ];
+
+=attr C<env_key_prefix_style>
+
+The mechanism for determing the C<prefix> for the C<%ENV> key.
+
+    'default'
+
+See  L<< C<env_key_prefix_styles>|/env_key_prefix_styles >>
+=cut
+
+_has env_key_prefix_style => q[ 'default' ];
+
+=attr C<env_key_style>
+
+The mechanism for determining the final C<%ENV> key for turning on debug.
+
+    'default'
+
+See L<< C<env_key_styles>|/env_key_styles >>
+
+=cut
+
+_has env_key_style        => q[ 'default' ];
+
+=attr C<full_sub_name>
+
+Fully qualified name of the C<sub> that will be injected to implement debugging.
+
+Default is:
+
+    <into> . '::' . <sub_name>
+
+Or
+
+    undef
+
+If C<sub_name> is C<undef>
+
+See L<< C<into>|/into >> and L<< C<sub_name>|/sub_name >>
+
+=cut
+
+_has full_sub_name        => q[ return if not $_[0]->sub_name   ; $_[0]->into . '::' . $_[0]->sub_name   ];
+
+=attr C<full_value_name>
+
+Fully qualified name of the C<value> that will be injected to implement debugging control.
+
+Default is:
+
+    <into> . '::' . <value_name>
+
+Or
+
+    undef
+
+If C<value_name> is C<undef>
+
+See L<< C<into>|/into >> and L<< C<value_name>|/value_name >>
+
+=cut
+
+_has full_value_name      => q[ return if not $_[0]->value_name ; $_[0]->into . '::' . $_[0]->value_name ];
+
+=attr C<into>
+
+The package we're injecting into.
+
+B<IMPORTANT>: This field cannot vivify itself and be expected to work.
+
+Because much code in this module depends on this field,
+if this field is B<NOT> populated explicity by the user, its likely
+to increase the stack depth, invalidating any value if L<< C<into_level>|/into_level >> that was specified.
+
+See L<< C<auto_set_into>|/auto_set_into >>
+
+=cut
+
+_has into       => q[ die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()' ];
+
+=attr C<into_level>
+
+The number of levels up to look for C<into>
+
+Note, that this value is expected to be provided by a consuming class somewhere, and is expected to be
+simply passed down from a user.
+
+See  L<< C<auto_set_into>|/auto_set_into >> for how to set C<into> sanely.
+
+=cut
+
+_has into_level => q[ 0 ];
+
+=attr C<sub_name>
+
+The name of the C<CODEREF> that will be installed into C<into>
+
+    'DEBUG'
+
+=cut
+
+_has sub_name   => q[ 'DEBUG' ];
+
+=attr C<value_name>
+
+The name of the C<$SCALAR> that will be installed into C<into>
+
+    'DEBUG' ## $DEBUG
+
+=cut
+
+_has value_name => q[ 'DEBUG' ];
+
+=attr C<env_key>
+
+The name of the primary C<%ENV> key that controls debugging of this package.
+
+If unspecified, will be determined by the L<< C<env_key_style>|/env_key_style >>
+
+Usually, this will be something like
+
+    <env_key_prefix>_DEBUG
+
+And where C<env_key_prefix> is factory,
+
+    <magictranslation(uc(into))>_DEBUG
+
+Aka:
+
+    SOME_PACKAGE_NAME_DEBUG
+
+=cut
+
+_has env_key => sub {
   my $style = $_[0]->env_key_style;
   if ( not exists $env_key_styles{$style} ) {
     die "No such env_key_style $style, options are @{ keys %env_key_styles }";
@@ -68,7 +289,23 @@ has env_key => sub {
   return $_[0]->$method();
 };
 
-has env_key_prefix => sub {
+=attr C<env_key_prefix>
+
+The name of the B<PREFIX> to use for C<%ENV> keys for this package.
+
+If unspecified, will be determined by the L<< C<env_key_prefix_style>|/env_key_prefix_style >>
+
+Usually, this will be something like
+
+    <magictranslation(uc(into))>
+
+Aka:
+
+    SOME_PACKAGE_NAME
+
+=cut
+
+_has env_key_prefix => sub {
   my $style = $_[0]->env_key_prefix_style;
   if ( not exists $env_key_prefix_styles{$style} ) {
     die "No such env_key_prefix_style $style, options are @{ keys %env_key_prefix_styles }";
@@ -77,7 +314,18 @@ has env_key_prefix => sub {
   return $_[0]->$method();
 };
 
-has debug_sub => sub {
+=attr C<debug_sub>
+
+The actual code ref to install to do the real debugging work.
+
+This is mostly an implementation detail, but if you were truely insane, you could pass a custom coderef
+to construction, and it would install the coderef you passed instead of the one we generate.
+
+Generated using L<< C<debug_style>|/debug_style >>
+
+=cut
+
+_has debug_sub => sub {
   my $style = $_[0]->debug_style;
   if ( not exists $debug_styles{$style} ) {
     die "No such debug_style $style, options are @{ keys %debug_styles }";
@@ -86,12 +334,36 @@ has debug_sub => sub {
   return $_[0]->$method();
 };
 
-has log_prefix_style => sub {
+=attr C<log_prefix_style>
+
+The default style to use for C<log_prefix>.
+
+If un-set, defaults to the value of C<$ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE}> if it exists,
+or simply C<'short'> if it does not.
+
+See L<< C<log_prefix_styles>|/log_prefix_styles >>
+
+=cut
+
+_has log_prefix_style => sub {
   return $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE} if $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE};
   return 'short';
 };
 
-has log_prefix => sub {
+=attr C<log_prefix>
+
+The string to prefix to log messages for debug implementations which use prefixes.
+
+If not specified, will be generated from the style specified by L<< C<log_prefix_style>|/log_prefix_style >>
+
+Which will be usually something like
+
+    Foo::Package::Bar # 'long'
+    F:P::Bar          # 'short'
+
+=cut
+
+_has log_prefix => sub {
   my $style = $_[0]->log_prefix_style;
   if ( not exists $log_prefix_styles{$style} ) {
     die "Unknown prefix style $style, should be one of @{ keys %log_prefix_styles }";
@@ -100,7 +372,23 @@ has log_prefix => sub {
   $_[0]->$method();
 };
 
-has is_env_debugging => sub {
+=attr C<is_env_debugging>
+
+The determination as to wether or not the C<%ENV> indicates debugging should be enabled.
+
+Will always be C<true> if C<$ENV{PACKAGE_DEBUG_ALL}>
+
+And will be C<true> if either L<< C<env_key>|/env_key >> or one of L<< C<env_key_aliases>|/env_key_aliases >>
+is C<true>.
+
+B<NOTE:> This value I<BINDS> the first time it is evaluated, so for granular control of debugging at runtime,
+you should not be lexically changing C<%ENV>.
+
+Instead, you should be modifying the value of C<$My::Package::Name::DEBUG>
+
+=cut
+
+_has is_env_debugging => sub {
   if ( $ENV{PACKAGE_DEBUG_ALL} ) {
     return 1;
   }
@@ -113,10 +401,66 @@ has is_env_debugging => sub {
   return undef;
 };
 
+=method C<auto_set_into>
+
+This method any plumbing will want to call.
+
+    $object->auto_set_into( $number_of_additional_stack_levels );
+
+Takes a parameter to indicate the expected additional levels of stack will be neeed.
+
+For instance:
+
+    sub import {
+        my ($self, %args ) = @_;
+        my $object = ...->new(%args);
+        $object->auto_set_into(1); # needs to be bound to the caller to import->()
+    }
+
+Or
+
+    sub import {
+        my ($self, %args ) = @_;
+        my $object = ...->new(%args);
+        __PACKAGE__->bar($object);
+
+    }
+    sub bar {
+        $_[1]->auto_set_into(2); # skip up to caller of bar, then to caller of import
+    }
+
+And in both these cases, the end user just does:
+
+    package::bar->import( into_level =>  0 ); # inject at this level
+
+=cut
+
 sub auto_set_into {
   my ( $self, $add ) = @_;
   $_[0]->{into} = [ caller( $self->into_level + $add ) ]->[0];
 }
+
+=method C<debug_prefixed_lines>
+
+    my $code = $object->debug_prefixed_lines;
+    $code->( $message );
+
+This Debug implementation returns a C<DEBUG> sub that treats all arguments as lines of message,
+and formats them as such:
+
+    [SomePrefix::Goes::Here] this is your messages first line\n
+    [SomePrefix::Goes::Here] this is your messages second line\n
+
+The exact prefix used is determined by L<< C<log_prefix>|/log_prefix >>,
+and the prefix will be omitted if C<log_prefix> is not defined.
+
+( Note: this will likely require explict passing of
+
+    log_prefix => undef
+
+)
+
+=cut
 
 sub debug_prefixed_lines {
   my $self = shift;
@@ -131,18 +475,90 @@ sub debug_prefixed_lines {
   };
 }
 
+
+=method C<debug_verbatim>
+
+This Debug implementation returns a C<DEBUG> sub that simply
+passes all parameters to C<< *STDERR->print >>, as long as debugging is turned on.
+
+    my $code = $object->debug_verbatim;
+    $code->( $message );
+
+
+=cut
+
+sub debug_verbatim {
+  my $self = shift;
+  return sub {
+    return unless $self->get_debug_value;
+    *STDERR->print(@_);
+  };
+}
+
+=method C<env_key_from_package>
+
+This C<env_key_style> simply appends C<_DEBUG> to the C<env_key_prefix>
+
+    my $key = $object->env_key_from_package;
+
+=cut
+
 sub env_key_from_package {
   return $_[0]->env_key_prefix() . '_DEBUG';
 }
 
+=method C<env_key_prefix_from_package>
+
+This L<< C<env_key_prefix_style>|/env_prefix_style >> converts L<< C<into>|/into >> to a useable C<%ENV> name.
+
+    Hello::World::Bar -> HELLO_WORLD_BAR
+
+Usage:
+
+    my $prefix = $object->env_key_prefix_from_package;
+
+=cut
+
 sub env_key_prefix_from_package {
-  my $package = $_[0]->package;
+  my $package = $_[0]->into;
   $package =~ s/::/_/g;
   return uc($package);
 }
 
+=method C<log_prefix_from_package_short>
+
+This L<< C<log_prefix_style>|/log_prefix_style >> determines a C<short> name by mutating C<into>.
+
+When the name is C<< <10 chars >> it is passed unmodified.
+
+Otherwise, it is tokenised, and all tokens bar the last are reduced to either
+
+=over 4
+
+=item a - groups of upper case only characters
+
+=item b - failing case a, single lower case characters.
+
+=back
+
+    Hello -> H
+    HELLO -> HELLO
+    DistZilla -> DZ
+    mutant -> m
+
+And then regrouped and the last attached
+
+    This::Is::A::Test -> T:I:A::Test
+    NationalTerrorismStrikeForce::SanDiego::SportsUtilityVehicle -> NTSF:SD::SportsUtilityVehicle
+
+Usage:
+
+    my $prefix = $object->log_prefix_from_package_short;
+
+=cut
+
 sub log_prefix_from_package_short {
-  my $package = $_[0]->package;
+  my $package = $_[0]->into;
   if ( ( length $package ) < 10 ) {
     return $package;
   }
@@ -159,9 +575,40 @@ sub log_prefix_from_package_short {
   return $left . '::' . $last;
 }
 
+=method C<log_prefix_from_package_long>
+
+This L<< C<log_prefix_style>|/log_prefix_style >> simply returns C<into> as-is.
+
+Usage:
+
+    my $prefix = $object->log_prefix_from_package_long;
+
+=cut
+
 sub log_prefix_from_package_long {
-  return $_[0]->package;
+  return $_[0]->into;
 }
+
+=p_func C<_has_value>
+
+Internal function shredded from guts of L<<< C<< Package::Stash::B<PP> >>|Package::Stash::PP >>>, for the purpose
+of determining if a given package already has a specific value defined or not.
+
+This is mostly to facilitate this:
+
+    BEGIN {
+        $Some::Package::DEBUG = 1;
+    }
+    use Some::Package;
+
+This way, we don't stomp over that value.
+
+Usage:
+
+    if ( _has_value( $package, $variable_name ) ) {
+        ...
+    }
+=cut
 
 sub _has_value {
   my $ns = do { no strict 'refs'; \%{ $_[0] . '::' } };
@@ -176,6 +623,16 @@ sub _has_value {
   return;
 }
 
+=method C<get_debug_value>
+
+Returns the "are we debugging right now" value.
+
+    if ( $object->get_debug_value ) {
+        print "DEBUGGING IS ON!"
+    }
+
+=cut
+
 sub get_debug_value {
   return $_[0]->is_env_debugging if not defined $_[0]->full_value_name;
   return do {
@@ -184,10 +641,20 @@ sub get_debug_value {
   };
 }
 
+=method C<inject_debug_value>
+
+Optimistically injects the desired C<$DEBUG> symbol into the package determined by C<full_value_name>.
+
+Preserves the existing value if such a symbol already exists.
+
+    $object->inject_debug_value();
+
+=cut
+
 sub inject_debug_value {
   return if not defined $_[0]->full_value_name;
   my $value = $_[0]->is_env_debugging;
-  if ( _has_value( $_[0]->package, $_[0]->value_name ) ) {
+  if ( _has_value( $_[0]->into, $_[0]->value_name ) ) {
     $value = $_[0]->get_debug_value;
   }
   return do {
@@ -195,6 +662,14 @@ sub inject_debug_value {
     *{ $_[0]->full_value_name } = \$value;
   };
 }
+
+=method C<inject_debug_sub>
+
+Injects the desired code reference C<DEBUG> symbol into the package determined by C<full_sub_name>
+
+    $object->inject_debug_sub();
+
+=cut
 
 sub inject_debug_sub {
   return if not defined $_[0]->full_sub_name;

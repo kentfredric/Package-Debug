@@ -32,6 +32,10 @@ at the cost of making ugly code.
 
 This module aims to implement the common utility, with less fuss:
 
+    $ENV{MY_BAZ_DEBUG} = 1;
+
+    package My::Baz;
+
     use Package::Debug;
 
     ...
