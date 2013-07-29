@@ -15,7 +15,7 @@ Uses L<< C<env_key_from_package>|/env_key_from_package >>
 
 =cut
 
-my %env_key_styles        = ( default => 'env_key_from_package', );
+my %env_key_styles = ( default => 'env_key_from_package', );
 
 =head2 C<env_key_prefix_styles>
 
@@ -39,7 +39,7 @@ Uses L<< C<log_prefix_from_package_long>|/log_prefix_from_package_long >>
 
 =cut
 
-my %log_prefix_styles     = (
+my %log_prefix_styles = (
   short => 'log_prefix_from_package_short',
   long  => 'log_prefix_from_package_long',
 );
@@ -136,7 +136,7 @@ See L<< C<debug_styles>|/debug_styles >>
 
 =cut
 
-_has debug_style          => q[ 'prefixed_lines' ];
+_has debug_style => q[ 'prefixed_lines' ];
 
 =attr C<env_key_aliases>
 
@@ -146,7 +146,7 @@ A C<[]> of C<%ENV> keys that also should trigger debugging on this package.
 
 =cut
 
-_has env_key_aliases      => q[ []  ];
+_has env_key_aliases => q[ []  ];
 
 =attr C<env_key_prefix_style>
 
@@ -169,7 +169,7 @@ See L<< C<env_key_styles>|/env_key_styles >>
 
 =cut
 
-_has env_key_style        => q[ 'default' ];
+_has env_key_style => q[ 'default' ];
 
 =attr C<full_sub_name>
 
@@ -189,7 +189,7 @@ See L<< C<into>|/into >> and L<< C<sub_name>|/sub_name >>
 
 =cut
 
-_has full_sub_name        => q[ return if not $_[0]->sub_name   ; $_[0]->into . '::' . $_[0]->sub_name   ];
+_has full_sub_name => q[ return if not $_[0]->sub_name   ; $_[0]->into . '::' . $_[0]->sub_name   ];
 
 =attr C<full_value_name>
 
@@ -209,7 +209,7 @@ See L<< C<into>|/into >> and L<< C<value_name>|/value_name >>
 
 =cut
 
-_has full_value_name      => q[ return if not $_[0]->value_name ; $_[0]->into . '::' . $_[0]->value_name ];
+_has full_value_name => q[ return if not $_[0]->value_name ; $_[0]->into . '::' . $_[0]->value_name ];
 
 =attr C<into>
 
@@ -225,7 +225,7 @@ See L<< C<auto_set_into>|/auto_set_into >>
 
 =cut
 
-_has into       => q[ die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()' ];
+_has into => q[ die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()' ];
 
 =attr C<into_level>
 
@@ -248,7 +248,7 @@ The name of the C<CODEREF> that will be installed into C<into>
 
 =cut
 
-_has sub_name   => q[ 'DEBUG' ];
+_has sub_name => q[ 'DEBUG' ];
 
 =attr C<value_name>
 
@@ -462,19 +462,33 @@ and the prefix will be omitted if C<log_prefix> is not defined.
 
 =cut
 
+# Note: Heavy hand-optimisation going on here, this is the hotpath
 sub debug_prefixed_lines {
-  my $self = shift;
+  my $self             = shift;
+  my $prefix           = $self->log_prefix;
+  my $full_name        = $self->full_value_name;
+  my $is_env_debugging = $self->is_env_debugging;
+
+  # without a full_name, debugging cannot be controlled by packages
+  # and env configuration binds above
+  # so if ENV says "no debugging" then "no debugging is going to happen in this runtime"
+  # -> NOP ;)
+  if ( not defined $full_name and not $is_env_debugging ) {
+    return sub { };
+  }
   return sub {
-    return unless $self->get_debug_value;
+    {
+      no strict 'refs';
+      return unless ${$full_name};
+    }
     my (@message) = @_;
     for my $line (@message) {
-      *STDERR->print( '[' . $self->log_prefix . '] ' ) if defined $self->log_prefix;
+      *STDERR->print( '[' . $prefix . '] ' ) if defined $prefix;
       *STDERR->print($line);
       *STDERR->print("\n");
     }
   };
 }
-
 
 =method C<debug_verbatim>
 
@@ -488,9 +502,22 @@ passes all parameters to C<< *STDERR->print >>, as long as debugging is turned o
 =cut
 
 sub debug_verbatim {
-  my $self = shift;
+  my $self             = shift;
+  my $full_name        = $self->full_value_name;
+  my $is_env_debugging = $self->is_env_debugging;
+
+  # without a full_name, debugging cannot be controlled by packages
+  # and env configuration binds above
+  # so if ENV says "no debugging" then "no debugging is going to happen in this runtime"
+  # -> NOP ;)
+  if ( not defined $full_name and not $is_env_debugging ) {
+    return sub { };
+  }
   return sub {
-    return unless $self->get_debug_value;
+    {
+      no strict 'refs';
+      return unless ${$full_name};
+    }
     *STDERR->print(@_);
   };
 }
@@ -634,10 +661,11 @@ Returns the "are we debugging right now" value.
 =cut
 
 sub get_debug_value {
-  return $_[0]->is_env_debugging if not defined $_[0]->full_value_name;
+  my $full_name = $_[0]->full_value_name;
+  return $_[0]->is_env_debugging if not defined $full_name;
   return do {
     no strict 'refs';
-    return ${ $_[0]->full_value_name };
+    return ${$full_name};
   };
 }
 
@@ -652,14 +680,15 @@ Preserves the existing value if such a symbol already exists.
 =cut
 
 sub inject_debug_value {
-  return if not defined $_[0]->full_value_name;
+  my $full_name = $_[0]->full_value_name;
+  return if not defined $full_name;
   my $value = $_[0]->is_env_debugging;
   if ( _has_value( $_[0]->into, $_[0]->value_name ) ) {
     $value = $_[0]->get_debug_value;
   }
   return do {
     no strict 'refs';
-    *{ $_[0]->full_value_name } = \$value;
+    *{$full_name} = \$value;
   };
 }
 
@@ -672,11 +701,12 @@ Injects the desired code reference C<DEBUG> symbol into the package determined b
 =cut
 
 sub inject_debug_sub {
-  return if not defined $_[0]->full_sub_name;
+  my $full_name = $_[0]->full_sub_name;
+  return if not defined $full_name;
   my $debug_sub = $_[0]->debug_sub;
   return do {
     no strict 'refs';
-    *{ $_[0]->full_sub_name } = $debug_sub;
+    *{$full_name} = $debug_sub;
   };
 }
 

@@ -57,7 +57,7 @@ on using environment or configuration files.
 
 The defacto DEBUG() stub when not in a debug environment should be a noop.
 
-However, when debugging is turned on, debugging backends should also be controllable via env/configuaration, 
+However, when debugging is turned on, debugging backends should also be controllable via env/configuaration,
 and proxy to things like Log::Message and friends.
 
 =item * Per-package debug granularity
