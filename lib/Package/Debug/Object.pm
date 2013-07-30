@@ -320,6 +320,70 @@ version 0.1.0
 
     my $object = Package::Debug::Object->new(%args);
 
+=head2 C<debug_style>
+
+=head2 C<set_debug_style>
+
+=head2 C<env_key_aliases>
+
+=head2 C<set_env_key_aliases>
+
+=head2 C<env_key_prefix_style>
+
+=head2 C<set_env_key_prefix_style>
+
+=head2 C<env_key_style>
+
+=head2 C<set_env_key_style>
+
+=head2 C<full_sub_name>
+
+=head2 C<set_full_sub_name>
+
+=head2 C<full_value_name>
+
+=head2 C<set_full_value_name>
+
+=head2 C<into>
+
+=head2 C<set_into>
+
+=head2 C<into_level>
+
+=head2 C<set_into_level>
+
+=head2 C<sub_name>
+
+=head2 C<set_sub_name>
+
+=head2 C<value_name>
+
+=head2 C<set_value_name>
+
+=head2 C<env_key>
+
+=head2 C<set_env_key>
+
+=head2 C<env_key_prefix>
+
+=head2 C<set_env_key_prefix>
+
+=head2 C<debug_sub>
+
+=head2 C<set_debug_sub>
+
+=head2 C<log_prefix_style>
+
+=head2 C<set_log_prefix_style>
+
+=head2 C<log_prefix>
+
+=head2 C<set_log_prefix>
+
+=head2 C<is_env_debugging>
+
+=head2 C<set_is_env_debugging>
+
 =head2 C<auto_set_into>
 
 This method any plumbing will want to call.
