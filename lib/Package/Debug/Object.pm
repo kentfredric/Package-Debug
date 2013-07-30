@@ -38,7 +38,7 @@ sub new {
 
 sub _has {
   my ( $name, $builder ) = @_;
-  local $@;
+  local $@ = undef;
   my $package = __PACKAGE__;
   my $builder_code;
   if ( ref $builder ) {
@@ -60,6 +60,7 @@ sub _has {
     ];
   eval $code;
   die "Compiling code << sub { $code } >> failed. $@" if $@;
+  return 1;
 }
 
 
