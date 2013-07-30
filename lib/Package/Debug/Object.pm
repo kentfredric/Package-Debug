@@ -694,7 +694,7 @@ Which will be usually something like
 
 =head2 C<is_env_debugging>
 
-The determination as to wether or not the C<%ENV> indicates debugging should be enabled.
+The determination as to whether or not the C<%ENV> indicates debugging should be enabled.
 
 Will always be C<true> if C<$ENV{PACKAGE_DEBUG_ALL}>
 
