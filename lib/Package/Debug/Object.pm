@@ -36,6 +36,24 @@ sub new {
 }
 
 
+sub _accessor {
+    my ( $package, $name, $builder ) = @_;
+    return <<"_AC_";
+sub ${package}::${name} {
+    return \$_[0]->{$name} if exists \$_[0]->{$name};
+    return ( \$_[0]->{$name} = \$_[0]->${builder}(splice \@_,1) );
+}
+_AC_
+}
+sub _setter {
+    my ( $package, $name ) = @_;
+return <<"_SET_";
+    sub ${package}::set_${name} {
+        \$_[0]->{$name} = \$_[1]; return \$_[0];
+    };
+_SET_
+}
+
 sub _has {
   my ( $name, $builder ) = @_;
   local $@ = undef;
@@ -48,16 +66,10 @@ sub _has {
     $builder_code = "sub ${package}::_build_${name} { $builder }";
   }
 
-  my $code = qq[
-        $builder_code;
-        sub ${package}::${name} {
-            return \$_[0]->{$name} if exists \$_[0]->{$name};
-            return ( \$_[0]->{$name} = \$_[0]->_build_${name}(splice \@_,1) );
-        };
-        sub ${package}::set_${name} {
-            \$_[0]->{$name} = \$_[1]; return \$_[0];
-        };
-    ];
+  my $code = $builder_code . 
+    _accessor($package,$name,"_build_$name").
+    _setter($package,$name,"_build_$name");
+
   eval $code;
   die "Compiling code << sub { $code } >> failed. $@" if $@;
   return 1;
