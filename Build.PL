@@ -24,6 +24,7 @@ my %module_build_args = (
   "recursive_test_files" => 1,
   "requires" => {
     "B" => 0,
+    "Readonly" => 0,
     "Scalar::Util" => 0,
     "perl" => "v5.10.0",
     "strict" => 0,

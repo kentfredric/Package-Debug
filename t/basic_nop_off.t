@@ -12,7 +12,7 @@ BEGIN {
 {
     package Foo;
 
-    use Package::Debug value_name => undef;
+    use Package::Debug;
 
     sub some_code {
         for ( 1 .. 1_000_000 ) {
@@ -24,7 +24,6 @@ BEGIN {
 stderr_like(sub {
     Foo->some_code();
 }, qr/^$/, 'Expected debug output is empty' );
-
 done_testing;
 
 

@@ -70,8 +70,8 @@ sub _has {
   my $code = $builder_code . _accessor( $package, $name, "_build_$name" ) . _setter( $package, $name, "_build_$name" );
 
   ## no critic (ProhibitStringyEval)
-  if( not eval "$code; 1" ){
-      die "Compiling code << sub { $code } >> failed. $@"
+  if ( not eval "$code; 1" ) {
+    die "Compiling code << sub { $code } >> failed. $@";
   }
   return 1;
 }
@@ -167,6 +167,9 @@ _has is_env_debugging => sub {
 };
 
 
+_has runtime_switchable => sub { 0 };
+
+
 sub auto_set_into {
   my ( $self, $add ) = @_;
   $_[0]->{into} = [ caller( $self->into_level + $add ) ]->[0];
@@ -176,23 +179,9 @@ sub auto_set_into {
 
 # Note: Heavy hand-optimisation going on here, this is the hotpath
 sub debug_prefixed_lines {
-  my $self             = shift;
-  my $prefix           = $self->log_prefix;
-  my $full_name        = $self->full_value_name;
-  my $is_env_debugging = $self->is_env_debugging;
-
-  # without a full_name, debugging cannot be controlled by packages
-  # and env configuration binds above
-  # so if ENV says "no debugging" then "no debugging is going to happen in this runtime"
-  # -> NOP ;)
-  if ( not defined $full_name and not $is_env_debugging ) {
-    return sub { };
-  }
+  my $self   = shift;
+  my $prefix = $self->log_prefix;
   return sub {
-    {
-      no strict 'refs';
-      return unless ${$full_name};
-    }
     my (@message) = @_;
     for my $line (@message) {
       *STDERR->print( '[' . $prefix . '] ' ) if defined $prefix;
@@ -204,22 +193,8 @@ sub debug_prefixed_lines {
 
 
 sub debug_verbatim {
-  my $self             = shift;
-  my $full_name        = $self->full_value_name;
-  my $is_env_debugging = $self->is_env_debugging;
-
-  # without a full_name, debugging cannot be controlled by packages
-  # and env configuration binds above
-  # so if ENV says "no debugging" then "no debugging is going to happen in this runtime"
-  # -> NOP ;)
-  if ( not defined $full_name and not $is_env_debugging ) {
-    return sub { };
-  }
+  my $self = shift;
   return sub {
-    {
-      no strict 'refs';
-      return unless ${$full_name};
-    }
     *STDERR->print(@_);
   };
 }
@@ -251,7 +226,7 @@ sub log_prefix_from_package_short {
       $_ =~ s/[[:lower:]]+//msxg;
       next;
     }
-    $_ = substr $_,0,1;
+    $_ = substr $_, 0, 1;
   }
   my ($prefix) = join q{:}, @tokens;
   return $prefix . q{::} . $suffix;
@@ -273,7 +248,7 @@ sub _has_value {
   require B;
   my $sv = B::svref_2object($ref)->SV;
   ## no critic (ProhibitPackageVars)
-  return 1 if $sv->isa('B::SV') || ( $sv->isa('B::SPECIAL') && $B::specialsv_name[${$sv}] ne 'Nullsv' );
+  return 1 if $sv->isa('B::SV') || ( $sv->isa('B::SPECIAL') && $B::specialsv_name[ ${$sv} ] ne 'Nullsv' );
   return;
 }
 
@@ -295,21 +270,61 @@ sub inject_debug_value {
   if ( _has_value( $_[0]->into, $_[0]->value_name ) ) {
     $value = $_[0]->get_debug_value;
   }
+  my $ro = $value;
+  if ( not $_[0]->runtime_switchable ) {
+    use Readonly;
+    Readonly::Scalar $ro, $value;
+  }
   return do {
     no strict 'refs';
-    *{$full_name} = \$value;
+    *{$full_name} = \$ro;
   };
+}
+
+sub _wrap_debug_sub_switchable {
+  my $full_name = $_[0]->full_sub_name;
+  return if not defined $full_name;
+  my $full_value_name  = $_[0]->full_value_name;
+  my $is_env_debugging = $_[0]->is_env_debugging;
+  my $debug_sub;
+  if ( not defined $full_value_name and not $is_env_debugging ) {
+    return sub { };
+  }
+  my $real_debug = $_[0]->debug_sub;
+  return sub {
+    {
+      no strict 'refs';
+      return unless ${$full_value_name};
+    }
+    goto $real_debug;
+  };
+}
+
+sub _wrap_debug_sub_frozen {
+  my $full_name = $_[0]->full_sub_name;
+  return if not defined $full_name;
+  my $debug_sub;
+  if ( not $_[0]->get_debug_value ) {
+    return sub { };
+  }
+  return $_[0]->debug_sub;
 }
 
 
 sub inject_debug_sub {
+  my $code;
+  if ( $_[0]->runtime_switchable ) {
+    $code = $_[0]->_wrap_debug_sub_switchable;
+  }
+  else {
+    $code = $_[0]->_wrap_debug_sub_frozen;
+  }
   my $full_name = $_[0]->full_sub_name;
-  return if not defined $full_name;
-  my $debug_sub = $_[0]->debug_sub;
   return do {
     no strict 'refs';
-    *{$full_name} = $debug_sub;
+    *{$full_name} = $code;
   };
+
 }
 
 1;
@@ -397,6 +412,17 @@ version 0.1.0
 =head2 C<is_env_debugging>
 
 =head2 C<set_is_env_debugging>
+
+=head2 C<runtime_switchable>
+
+This controls wether or not
+
+    $YourPackage::DEBUG
+
+Should be modifiable at run-time.
+
+If it is C<true>, then a performance penalty will occur, because the C<DEBUG> sub can no longer be
+a complete C<no-op>, due to needing to check the value of this variable every time it is called.
 
 =head2 C<auto_set_into>
 
