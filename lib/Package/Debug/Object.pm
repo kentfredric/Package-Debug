@@ -414,16 +414,9 @@ version 0.1.0
 
 =head2 C<set_is_env_debugging>
 
+=head2 C<set_runtime_switchable>
+
 =head2 C<runtime_switchable>
-
-This controls wether or not
-
-    $YourPackage::DEBUG
-
-Should be modifiable at run-time.
-
-If it is C<true>, then a performance penalty will occur, because the C<DEBUG> sub can no longer be
-a complete C<no-op>, due to needing to check the value of this variable every time it is called.
 
 =head2 C<auto_set_into>
 
@@ -732,6 +725,17 @@ B<NOTE:> This value I<BINDS> the first time it is evaluated, so for granular con
 you should not be lexically changing C<%ENV>.
 
 Instead, you should be modifying the value of C<$My::Package::Name::DEBUG>
+
+=head2 C<runtime_switchable>
+
+This controls wether or not
+
+    $YourPackage::DEBUG
+
+Should be modifiable at run-time.
+
+If it is C<true>, then a performance penalty will occur, because the C<DEBUG> sub can no longer be
+a complete C<no-op>, due to needing to check the value of this variable every time it is called.
 
 =head1 STYLES
 
