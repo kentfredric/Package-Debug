@@ -309,7 +309,7 @@ sub inject_debug_sub {
   };
 }
 
-1
+1;
 
 __END__
 
