@@ -12,13 +12,13 @@ BEGIN {
 # ABSTRACT: Object oriented guts to Package::Debug
 
 
-my %env_key_styles        = ( default => 'env_key_from_package', );
+my %env_key_styles = ( default => 'env_key_from_package', );
 
 
 my %env_key_prefix_styles = ( default => 'env_key_prefix_from_package', );
 
 
-my %log_prefix_styles     = (
+my %log_prefix_styles = (
   short => 'log_prefix_from_package_short',
   long  => 'log_prefix_from_package_long',
 );
@@ -63,31 +63,31 @@ sub _has {
 }
 
 
-_has debug_style          => q[ 'prefixed_lines' ];
+_has debug_style => q[ 'prefixed_lines' ];
 
 
-_has env_key_aliases      => q[ []  ];
+_has env_key_aliases => q[ []  ];
 
 
 _has env_key_prefix_style => q[ 'default' ];
 
 
-_has env_key_style        => q[ 'default' ];
+_has env_key_style => q[ 'default' ];
 
 
-_has full_sub_name        => q[ return if not $_[0]->sub_name   ; $_[0]->into . '::' . $_[0]->sub_name   ];
+_has full_sub_name => q[ return if not $_[0]->sub_name   ; $_[0]->into . '::' . $_[0]->sub_name   ];
 
 
-_has full_value_name      => q[ return if not $_[0]->value_name ; $_[0]->into . '::' . $_[0]->value_name ];
+_has full_value_name => q[ return if not $_[0]->value_name ; $_[0]->into . '::' . $_[0]->value_name ];
 
 
-_has into       => q[ die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()' ];
+_has into => q[ die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()' ];
 
 
 _has into_level => q[ 0 ];
 
 
-_has sub_name   => q[ 'DEBUG' ];
+_has sub_name => q[ 'DEBUG' ];
 
 
 _has value_name => q[ 'DEBUG' ];
@@ -161,21 +161,22 @@ sub auto_set_into {
 
 # Note: Heavy hand-optimisation going on here, this is the hotpath
 sub debug_prefixed_lines {
-  my $self = shift;
-  my $prefix = $self->log_prefix;
-  my $full_name = $self->full_value_name;
+  my $self             = shift;
+  my $prefix           = $self->log_prefix;
+  my $full_name        = $self->full_value_name;
   my $is_env_debugging = $self->is_env_debugging;
+
   # without a full_name, debugging cannot be controlled by packages
   # and env configuration binds above
   # so if ENV says "no debugging" then "no debugging is going to happen in this runtime"
   # -> NOP ;)
   if ( not defined $full_name and not $is_env_debugging ) {
-      return sub {};
+    return sub { };
   }
   return sub {
     {
-        no strict 'refs';
-        return unless ${ $full_name };
+      no strict 'refs';
+      return unless ${$full_name};
     }
     my (@message) = @_;
     for my $line (@message) {
@@ -187,11 +188,23 @@ sub debug_prefixed_lines {
 }
 
 
-
 sub debug_verbatim {
-  my $self = shift;
+  my $self             = shift;
+  my $full_name        = $self->full_value_name;
+  my $is_env_debugging = $self->is_env_debugging;
+
+  # without a full_name, debugging cannot be controlled by packages
+  # and env configuration binds above
+  # so if ENV says "no debugging" then "no debugging is going to happen in this runtime"
+  # -> NOP ;)
+  if ( not defined $full_name and not $is_env_debugging ) {
+    return sub { };
+  }
   return sub {
-    return unless $self->get_debug_value;
+    {
+      no strict 'refs';
+      return unless ${$full_name};
+    }
     *STDERR->print(@_);
   };
 }
@@ -252,7 +265,7 @@ sub get_debug_value {
   return $_[0]->is_env_debugging if not defined $full_name;
   return do {
     no strict 'refs';
-    return ${ $full_name };
+    return ${$full_name};
   };
 }
 
@@ -266,7 +279,7 @@ sub inject_debug_value {
   }
   return do {
     no strict 'refs';
-    *{ $full_name } = \$value;
+    *{$full_name} = \$value;
   };
 }
 
@@ -277,7 +290,7 @@ sub inject_debug_sub {
   my $debug_sub = $_[0]->debug_sub;
   return do {
     no strict 'refs';
-    *{ $full_name } = $debug_sub;
+    *{$full_name} = $debug_sub;
   };
 }
 

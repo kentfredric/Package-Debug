@@ -13,6 +13,7 @@ perlcritic.rc
 t/00-compile.t
 t/000-report-versions-tiny.t
 t/basic.t
+t/basic_nop_off.t
 t/basic_off.t
 t/long_package_name.t
 t/long_package_name_full.t
