@@ -728,7 +728,7 @@ Instead, you should be modifying the value of C<$My::Package::Name::DEBUG>
 
 =head2 C<runtime_switchable>
 
-This controls wether or not
+This controls whether or not
 
     $YourPackage::DEBUG
 
