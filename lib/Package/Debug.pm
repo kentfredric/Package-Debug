@@ -82,6 +82,16 @@ And all the right things should still occur.
 Additionally, this module will eventually add a bunch of features, that are by default off, but can be toggled
 on using environment or configuration files.
 
+=begin MetaPOD::JSON v1.1.0
+
+{
+    "namespace":"Package::Debug",
+    "interface":"exporter"
+}
+
+
+=end MetaPOD::JSON
+
 =head1 EXPECTED FEATURES
 
 =over 4

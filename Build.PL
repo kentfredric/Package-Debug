@@ -34,6 +34,7 @@ my %module_build_args = (
   "test_requires" => {
     "File::Find" => 0,
     "File::Temp" => 0,
+    "Test::Fatal" => 0,
     "Test::More" => "0.98",
     "Test::Output" => 0
   }

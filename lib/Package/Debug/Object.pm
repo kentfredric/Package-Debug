@@ -819,6 +819,16 @@ Usage:
         ...
     }
 
+=begin MetaPOD::JSON v1.1.0
+
+{
+    "namespace":"Package::Debug::Object",
+    "interface":"class"
+}
+
+
+=end MetaPOD::JSON
+
 =head1 AUTHOR
 
 Kent Fredric <kentfredric@gmail.com>
