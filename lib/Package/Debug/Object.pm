@@ -5,6 +5,8 @@ package Package::Debug::Object;
 
 # ABSTRACT: Object oriented guts to Package::Debug
 
+use Readonly;
+
 =head1 STYLES
 
 =head2 C<env_key_styles>
@@ -479,9 +481,13 @@ _has is_env_debugging => sub {
   return;
 };
 
+=method C<set_runtime_switchable>
+
 =method C<runtime_switchable>
 
-This controls wether or not
+=attr C<runtime_switchable>
+
+This controls whether or not
 
     $YourPackage::DEBUG
 
@@ -757,7 +763,6 @@ sub inject_debug_value {
   }
   my $ro = $value;
   if ( not $_[0]->runtime_switchable ) {
-    use Readonly;
     Readonly::Scalar $ro, $value;
   }
   return do {
