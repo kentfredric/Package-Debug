@@ -7,6 +7,15 @@ package Package::Debug::Object;
 
 use Readonly;
 
+=begin MetaPOD::JSON v1.1.0
+
+{
+    "namespace":"Package::Debug::Object",
+    "interface":"class"
+}
+
+=end MetaPOD::JSON
+
 =head1 STYLES
 
 =head2 C<env_key_styles>

@@ -5,6 +5,15 @@ package Package::Debug;
 
 # ABSTRACT: Add ENV/Config controlled debug tokens to your code
 
+=begin MetaPOD::JSON v1.1.0
+
+{
+    "namespace":"Package::Debug",
+    "interface":"exporter"
+}
+
+=end MetaPOD::JSON
+
 =head1 SYNOPSIS
 
 There is a lot of code on C<CPAN> that has something like this in it:
