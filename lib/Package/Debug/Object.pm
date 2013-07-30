@@ -246,13 +246,13 @@ sub log_prefix_from_package_short {
   my ($suffix) = pop @tokens;
   for (@tokens) {
     if ( $_ =~ /[[:upper:]]/ ) {
-      $_ =~ s/[[:lower:]]+//g;
+      $_ =~ s/[[:lower:]]+//msxg;
       next;
     }
     $_ =~ substr($_,0,1);
   }
   my ($prefix) = join q{:}, @tokens;
-  return $prefix . '::' . $suffix;
+  return $prefix . q{::} . $suffix;
 }
 
 
