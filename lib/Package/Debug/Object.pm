@@ -243,16 +243,16 @@ sub log_prefix_from_package_short {
     return $package;
   }
   my (@tokens) = split /::/, $package;
-  my ($last) = pop @tokens;
+  my ($suffix) = pop @tokens;
   for (@tokens) {
-    if ( $_ =~ /[A-Z]/ ) {
-      $_ =~ s/[a-z]+//g;
+    if ( $_ =~ /[[:upper:]]/ ) {
+      $_ =~ s/[[:lower:]]+//g;
       next;
     }
-    $_ =~ s/^(.).*/$1/;
+    $_ =~ substr($_,0,1);
   }
-  my ($left) = join q{:}, @tokens;
-  return $left . '::' . $last;
+  my ($prefix) = join q{:}, @tokens;
+  return $prefix . '::' . $suffix;
 }
 
 
@@ -262,7 +262,7 @@ sub log_prefix_from_package_long {
 
 
 sub _has_value {
-  my $ns = do { no strict 'refs'; \%{ $_[0] . '::' } };
+  my $ns = do { no strict 'refs'; \%{ $_[0] . q{::} } };
   return if not exists $ns->{ $_[1] };
   my $ref = \$ns->{ $_[1] };
   return unless ref $ref;
@@ -270,7 +270,8 @@ sub _has_value {
   return unless Scalar::Util::reftype($ref) eq 'GLOB';
   require B;
   my $sv = B::svref_2object($ref)->SV;
-  return 1 if $sv->isa('B::SV') || ( $sv->isa('B::SPECIAL') && $B::specialsv_name[$$sv] ne 'Nullsv' );
+  ## no critic (ProhibitPackageVars)
+  return 1 if $sv->isa('B::SV') || ( $sv->isa('B::SPECIAL') && $B::specialsv_name[${$sv}] ne 'Nullsv' );
   return;
 }
 
