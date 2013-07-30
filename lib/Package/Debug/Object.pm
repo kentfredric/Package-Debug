@@ -466,7 +466,7 @@ This C<env_key_style> simply appends C<_DEBUG> to the C<env_key_prefix>
 
 =head2 C<env_key_prefix_from_package>
 
-This L<< C<env_key_prefix_style>|/env_prefix_style >> converts L<< C<into>|/into >> to a useable C<%ENV> name.
+This L<< C<env_key_prefix_style>|/env_prefix_style >> converts L<< C<into>|/into >> to a useful C<%ENV> name.
 
     Hello::World::Bar -> HELLO_WORLD_BAR
 
@@ -480,7 +480,7 @@ This L<< C<log_prefix_style>|/log_prefix_style >> determines a C<short> name by 
 
 When the name is C<< <10 chars >> it is passed unmodified.
 
-Otherwise, it is tokenized, and all tokens bar the last are reduced to either
+Otherwise, it is tokenised, and all tokens bar the last are reduced to either
 
 =over 4
 
@@ -667,8 +667,8 @@ Aka:
 
 The actual code ref to install to do the real debugging work.
 
-This is mostly an implementation detail, but if you were truely insane, you could pass a custom coderef
-to construction, and it would install the coderef you passed instead of the one we generate.
+This is mostly an implementation detail, but if you were truly insane, you could pass a custom C<coderef>
+to construction, and it would install the C<coderef> you passed instead of the one we generate.
 
 Generated using L<< C<debug_style>|/debug_style >>
 
@@ -676,7 +676,7 @@ Generated using L<< C<debug_style>|/debug_style >>
 
 The default style to use for C<log_prefix>.
 
-If un-set, defaults to the value of C<$ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE}> if it exists,
+If not set, defaults to the value of C<$ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE}> if it exists,
 or simply C<'short'> if it does not.
 
 See L<< C<log_prefix_styles>|/log_prefix_styles >>
@@ -701,7 +701,7 @@ Will always be C<true> if C<$ENV{PACKAGE_DEBUG_ALL}>
 And will be C<true> if either L<< C<env_key>|/env_key >> or one of L<< C<env_key_aliases>|/env_key_aliases >>
 is C<true>.
 
-B<NOTE:> This value I<BINDS> the first time it is evaluated, so for granular control of debugging at runtime,
+B<NOTE:> This value I<BINDS> the first time it is evaluated, so for granular control of debugging at run-time,
 you should not be lexically changing C<%ENV>.
 
 Instead, you should be modifying the value of C<$My::Package::Name::DEBUG>
