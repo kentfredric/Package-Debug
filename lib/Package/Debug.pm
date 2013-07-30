@@ -7,7 +7,7 @@ package Package::Debug;
 
 =head1 SYNOPSIS
 
-There is a lot of code on CPAN that has something like this in it:
+There is a lot of code on C<CPAN> that has something like this in it:
 
     our $DEBUG = $ENV{MY_PACKAGE_NAME_DEBUG};
 
@@ -53,9 +53,9 @@ on using environment or configuration files.
 
 =over 4
 
-=item * Deferrable debug mechanism
+=item * Deferable debug mechanism
 
-The defacto DEBUG() stub when not in a debug environment should be a noop.
+The de-facto C<DEBUG()> stub when not in a debug environment should be a no-op, or as close to a no-op as possible.
 
 However, when debugging is turned on, debugging backends should also be controllable via env/configuaration,
 and proxy to things like Log::Message and friends.
@@ -80,5 +80,6 @@ sub import {
   $object->auto_set_into(1);
   $object->inject_debug_value();
   $object->inject_debug_sub();
+  return $object;
 }
 1;
