@@ -11,6 +11,8 @@ BEGIN {
 
 # ABSTRACT: Object oriented guts to Package::Debug
 
+use Readonly;
+
 
 my %env_key_styles = ( default => 'env_key_from_package', );
 
@@ -272,7 +274,6 @@ sub inject_debug_value {
   }
   my $ro = $value;
   if ( not $_[0]->runtime_switchable ) {
-    use Readonly;
     Readonly::Scalar $ro, $value;
   }
   return do {

@@ -86,21 +86,21 @@ on using environment or configuration files.
 
 =over 4
 
-=item * Deferable debug mechanism
+=item * Deferrable debug mechanism
 
-The de-facto C<DEBUG()> stub when not in a debug environment should be a no-op, or as close to a no-op as possible.
+The defacto C<DEBUG()> stub when not in a debug environment should be a no-op, or as close to a no-op as possible.
 
-However, when debugging is turned on, debugging backends should also be controllable via env/configuaration,
+However, when debugging is turned on, debugging back ends should also be controllable via env/configuaration,
 and proxy to things like Log::Message and friends.
 
 =item * Per-package debug granularity
 
 Every package will get its own independent DEBUG key, and DEBUG for a class can be toggled
-with an ENV key relevant to that class.
+with an C<%ENV> key relevant to that class.
 
 =item * Global Debugging
 
-In addition to package level granularity, global debugging can also be enabled, while still seeing the individual packages the debug message eminates from.
+In addition to package level granularity, global debugging can also be enabled, while still seeing the individual packages the debug message emanates from.
 
 =back
 
@@ -133,7 +133,7 @@ This is because for the last example to work, the C<DEBUG> sub would have to che
 
 And this will roughly double the cost of calling C<DEBUG>
 
-=head2 If you want runtime adjustment
+=head2 If you want run time adjustment
 
     use Package::Debug runtime_switchable => 1;
 

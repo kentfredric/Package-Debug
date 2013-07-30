@@ -48,25 +48,25 @@ SYNOPSIS
     configuration files.
 
 EXPECTED FEATURES
-    *   Deferable debug mechanism
+    *   Deferrable debug mechanism
 
-        The de-facto "DEBUG()" stub when not in a debug environment should
-        be a no-op, or as close to a no-op as possible.
+        The defacto "DEBUG()" stub when not in a debug environment should be
+        a no-op, or as close to a no-op as possible.
 
-        However, when debugging is turned on, debugging backends should also
-        be controllable via env/configuaration, and proxy to things like
-        Log::Message and friends.
+        However, when debugging is turned on, debugging back ends should
+        also be controllable via env/configuaration, and proxy to things
+        like Log::Message and friends.
 
     *   Per-package debug granularity
 
         Every package will get its own independent DEBUG key, and DEBUG for
-        a class can be toggled with an ENV key relevant to that class.
+        a class can be toggled with an %ENV key relevant to that class.
 
     *   Global Debugging
 
         In addition to package level granularity, global debugging can also
         be enabled, while still seeing the individual packages the debug
-        message eminates from.
+        message emanates from.
 
 PERFORMANCE
     For the best speed,
@@ -99,7 +99,7 @@ PERFORMANCE
 
     And this will roughly double the cost of calling "DEBUG"
 
-  If you want runtime adjustment
+  If you want run time adjustment
         use Package::Debug runtime_switchable => 1;
 
     This will
