@@ -150,13 +150,14 @@ _has is_env_debugging => sub {
 
     return 1;
   }
-  return undef;
+  return;
 };
 
 
 sub auto_set_into {
   my ( $self, $add ) = @_;
   $_[0]->{into} = [ caller( $self->into_level + $add ) ]->[0];
+  return $self;
 }
 
 
@@ -218,7 +219,9 @@ sub env_key_from_package {
 
 sub env_key_prefix_from_package {
   my $package = $_[0]->into;
-  $package =~ s/::/_/g;
+  $package =~ s{
+    ::
+  }{_}msxg;
   return uc($package);
 }
 
