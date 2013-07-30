@@ -69,8 +69,9 @@ sub _has {
 
   my $code = $builder_code . _accessor( $package, $name, "_build_$name" ) . _setter( $package, $name, "_build_$name" );
 
-  eval $code;
-  die "Compiling code << sub { $code } >> failed. $@" if $@;
+  if( not eval "$code; 1" ){
+      die "Compiling code << sub { $code } >> failed. $@"
+  }
   return 1;
 }
 
@@ -233,7 +234,7 @@ sub env_key_prefix_from_package {
   $package =~ s{
     ::
   }{_}msxg;
-  return uc($package);
+  return uc $package;
 }
 
 
@@ -249,7 +250,7 @@ sub log_prefix_from_package_short {
       $_ =~ s/[[:lower:]]+//msxg;
       next;
     }
-    $_ =~ substr($_,0,1);
+    $_ = substr $_,0,1;
   }
   my ($prefix) = join q{:}, @tokens;
   return $prefix . q{::} . $suffix;
