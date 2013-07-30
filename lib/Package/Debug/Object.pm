@@ -69,6 +69,7 @@ sub _has {
 
   my $code = $builder_code . _accessor( $package, $name, "_build_$name" ) . _setter( $package, $name, "_build_$name" );
 
+  ## no critic (ProhibitStringyEval)
   if( not eval "$code; 1" ){
       die "Compiling code << sub { $code } >> failed. $@"
   }
@@ -403,7 +404,7 @@ This method any plumbing will want to call.
 
     $object->auto_set_into( $number_of_additional_stack_levels );
 
-Takes a parameter to indicate the expected additional levels of stack will be neeed.
+Takes a parameter to indicate the expected additional levels of stack will be need.
 
 For instance:
 
@@ -443,7 +444,7 @@ and formats them as such:
 The exact prefix used is determined by L<< C<log_prefix>|/log_prefix >>,
 and the prefix will be omitted if C<log_prefix> is not defined.
 
-( Note: this will likely require explict passing of
+( Note: this will likely require explicit passing of
 
     log_prefix => undef
 
@@ -479,7 +480,7 @@ This L<< C<log_prefix_style>|/log_prefix_style >> determines a C<short> name by 
 
 When the name is C<< <10 chars >> it is passed unmodified.
 
-Otherwise, it is tokenised, and all tokens bar the last are reduced to either
+Otherwise, it is tokenized, and all tokens bar the last are reduced to either
 
 =over 4
 
@@ -551,7 +552,7 @@ A C<[]> of C<%ENV> keys that also should trigger debugging on this package.
 
 =head2 C<env_key_prefix_style>
 
-The mechanism for determing the C<prefix> for the C<%ENV> key.
+The mechanism for determining the C<prefix> for the C<%ENV> key.
 
     'default'
 
@@ -604,7 +605,7 @@ The package we're injecting into.
 B<IMPORTANT>: This field cannot vivify itself and be expected to work.
 
 Because much code in this module depends on this field,
-if this field is B<NOT> populated explicity by the user, its likely
+if this field is B<NOT> populated explicitly by the user, its likely
 to increase the stack depth, invalidating any value if L<< C<into_level>|/into_level >> that was specified.
 
 See L<< C<auto_set_into>|/auto_set_into >>
