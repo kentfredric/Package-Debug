@@ -242,10 +242,10 @@ sub log_prefix_from_package_short {
   if ( ( length $package ) < 10 ) {
     return $package;
   }
-  my (@tokens) = split /::/, $package;
+  my (@tokens) = split /::/msx, $package;
   my ($suffix) = pop @tokens;
   for (@tokens) {
-    if ( $_ =~ /[[:upper:]]/ ) {
+    if ( $_ =~ /[[:upper:]]/msx ) {
       $_ =~ s/[[:lower:]]+//msxg;
       next;
     }
