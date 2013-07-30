@@ -106,7 +106,7 @@ In addition to package level granularity, global debugging can also be enabled, 
 
 =head1 PERFORMANCE
 
-For the best speed, 
+For the best speed,
 
     use Package::Debug;
 
