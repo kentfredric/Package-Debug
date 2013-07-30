@@ -49,6 +49,13 @@ And all the right things should still occur.
 Additionally, this module will eventually add a bunch of features, that are by default off, but can be toggled
 on using environment or configuration files.
 
+{
+    "namespace":"Package::Debug",
+    "interface":"exporter"
+}
+
+
+
 # EXPECTED FEATURES
 
 - Deferrable debug mechanism
