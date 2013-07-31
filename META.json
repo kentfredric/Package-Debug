@@ -72,6 +72,17 @@
       }
    },
    "release_status" : "stable",
+   "resources" : {
+      "bugtracker" : {
+         "web" : "https://github.com/kentfredric/Package-Debug/issues"
+      },
+      "homepage" : "https://github.com/kentfredric/Package-Debug",
+      "repository" : {
+         "type" : "git",
+         "url" : "https://github.com/kentfredric/Package-Debug.git",
+         "web" : "https://github.com/kentfredric/Package-Debug"
+      }
+   },
    "version" : "0.1.0",
    "x_BuiltWith" : {
       "modules" : {
