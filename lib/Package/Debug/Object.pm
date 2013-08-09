@@ -275,11 +275,11 @@ sub inject_debug_value {
   return if not defined $value_name;
   my $value = $_[0]->is_env_debugging;
   my $stash = $_[0]->into_stash;
-  if ( $stash->has_symbol('$' . $value_name) ) {
-    $value = $stash->get_symbol('$' . $value_name);
-    $stash->remove_symbol('$' . $value_name);
+  if ( $stash->has_symbol(q[$] . $value_name) ) {
+    $value = $stash->get_symbol(q[$] . $value_name);
+    $stash->remove_symbol(q[$] . $value_name);
   }
-  $stash->add_symbol('$' . $value_name, \$value );
+  $stash->add_symbol(q[$] . $value_name, \$value );
 }
 
 sub _wrap_debug_sub {
@@ -291,7 +291,7 @@ sub _wrap_debug_sub {
     return sub { };
   }
   my $real_debug = $_[0]->debug_sub;
-  my $symbol = $_[0]->into_stash->get_symbol('$' . $value_name );
+  my $symbol = $_[0]->into_stash->get_symbol(q[$] . $value_name );
   return sub {
     return unless ${$symbol};
     goto $real_debug;
@@ -300,7 +300,7 @@ sub _wrap_debug_sub {
 
 
 sub inject_debug_sub {
-  $_[0]->into_stash->add_symbol( '&' . $_[0]->sub_name, $_[0]->_wrap_debug_sub );
+  $_[0]->into_stash->add_symbol( q[&] . $_[0]->sub_name, $_[0]->_wrap_debug_sub );
 }
 
 1;
