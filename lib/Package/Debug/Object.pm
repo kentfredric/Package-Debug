@@ -280,6 +280,7 @@ sub inject_debug_value {
     $stash->remove_symbol(q[$] . $value_name);
   }
   $stash->add_symbol(q[$] . $value_name, \$value );
+  return $_[0];
 }
 
 sub _wrap_debug_sub {
@@ -301,6 +302,7 @@ sub _wrap_debug_sub {
 
 sub inject_debug_sub {
   $_[0]->into_stash->add_symbol( q[&] . $_[0]->sub_name, $_[0]->_wrap_debug_sub );
+  return $_[0];
 }
 
 1;
