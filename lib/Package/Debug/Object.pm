@@ -453,7 +453,7 @@ sub into_stash {
     require Package::Stash;
     return ( $_[0]->{into_stash} = Package::Stash->new( $_[0]->into ));
 }
-sub set_into_stash { 
+sub set_into_stash {
     $_[0]->{into_stash} = $_[1]; return $_[0];
 }
 
