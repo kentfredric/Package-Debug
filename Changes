@@ -1,13 +1,16 @@
 Release history for Package-Debug
 
-0.2.0 2013-08-09T22:40:17Z
+0.2.0 2013-08-09T22:42:14Z
  [!Major]
  - runtime_switchable feature removed in favour of more general purpose
-   code, that is performant even *with* runtime switchability being on by default.
+   code, that is performant even *with* runtime switchability being on by
+   default.
  - Class methods starting with full_ removed as they're no longer used.
- - Additionally, loading `Readonly` to implement above feaures usually costed more than it saved.
- - Internals changes now means that only ~90 statements are required to execute during ->import()
-    whereas previously it was more like ~500 statements.
+ - Additionally, loading `Readonly` to implement above feaures usually
+   costed more than it saved.
+ - Internals changes now means that only ~90 statements are required to
+   execute during ->import() whereas previously it was more like ~500
+   statements.
 
  [Dependencies::Added / runtime requires]
  - Package::Stash
@@ -36,7 +39,8 @@ Release history for Package-Debug
 
  [Internals]
  - Package stash mangling now done by Package::Stash
- - '_has' attribute generator removed in favor of hand-inlined methods, which is easier to profile and debug.
+ - '_has' attribute generator removed in favor of hand-inlined methods,
+   which is easier to profile and debug.
 
 0.1.0 2013-07-31T03:19:56Z
  - First version.
