@@ -84,11 +84,10 @@ my $i;
 no_fatals "get the instance" => sub {
   $i = Foo->i_instance;
 };
-my $f = fatals "trying to change DEBUG variable" => sub {
+no_fatals "trying to change DEBUG variable" => sub {
   no warnings 'once';
   $Foo::DEBUG = 2;
 };
-like( $f, qr/read-only/i, "Failure is a readonly problem" );
 
 no_fatals "safe methods" => sub {
   call_value_is( $i, 'debug_style',                   [], 'prefixed_lines' );
@@ -98,8 +97,6 @@ no_fatals "safe methods" => sub {
   call_value_is( $i, 'env_key_prefix_from_package',   [], 'FOO' );
   call_value_is( $i, 'env_key_prefix_style',          [], 'default' );
   call_value_is( $i, 'env_key_style',                 [], 'default' );
-  call_value_is( $i, 'full_sub_name',                 [], 'Foo::DEBUG' );
-  call_value_is( $i, 'full_value_name',               [], 'Foo::DEBUG' );
   call_value_is( $i, 'into',                          [], 'Foo' );
   call_value_is( $i, 'into_level',                    [], '0' );
   call_value_is( $i, 'log_prefix',                    [], 'Foo' );
@@ -112,8 +109,7 @@ no_fatals "safe methods" => sub {
   call_value_is_ref( $i, 'debug_prefixed_lines', [], 'CODE' );
   call_value_is_ref( $i, 'debug_sub',            [], 'CODE' );
   call_value_is_ref( $i, 'debug_verbatim',       [], 'CODE' );
-  call_value_not_ok( $i, 'is_env_debugging',   [] );
-  call_value_not_ok( $i, 'runtime_switchable', [] );
+  call_value_not_ok( $i, 'is_env_debugging', [] );
 
 };
 

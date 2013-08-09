@@ -6,7 +6,7 @@ BEGIN {
   $Package::Debug::AUTHORITY = 'cpan:KENTNL';
 }
 {
-  $Package::Debug::VERSION = '0.1.0';
+  $Package::Debug::VERSION = '0.2.0';
 }
 
 # ABSTRACT: Add ENV/Config controlled debug tokens to your code
@@ -22,7 +22,6 @@ sub import {
   return $object;
 }
 
-
 1;
 
 __END__
@@ -37,7 +36,7 @@ Package::Debug - Add ENV/Config controlled debug tokens to your code
 
 =head1 VERSION
 
-version 0.1.0
+version 0.2.0
 
 =head1 SYNOPSIS
 
@@ -111,49 +110,6 @@ with an C<%ENV> key relevant to that class.
 =item * Global Debugging
 
 In addition to package level granularity, global debugging can also be enabled, while still seeing the individual packages the debug message emanates from.
-
-=back
-
-=head1 PERFORMANCE
-
-For the best speed,
-
-    use Package::Debug;
-
-This will do its best to produce a C<no-op> sub when debugging is not requested by C<%ENV>
-
-However, this comes at a price, namely, if you want to turn on debugging in code, you have to either
-
-    BEGIN {  $ENV{YOUR_PACKAGE_NAME_DEBUG} = 1 }
-    use Your::Package::Name;
-    # debugging is on
-
-Or
-
-    BEGIN {  $Your::Package::Name::DEBUG = 1 }
-    use Your::Package::Name;
-    # debugging is on
-
-And this will not work:
-
-    use Your::Package::Name;
-    $Your::Package::Name::DEBUG = 1; # Modification of Readonly value
-
-This is because for the last example to work, the C<DEBUG> sub would have to check that value every time it was called.
-
-And this will roughly double the cost of calling C<DEBUG>
-
-=head2 If you want run time adjustment
-
-    use Package::Debug runtime_switchable => 1;
-
-This will
-
-=over 4
-
-=item a - not make C<$DEBUG> C<readonly> during import.
-
-=item b - inject a C<DEBUG> C<sub> that checks the value of the former.
 
 =back
 

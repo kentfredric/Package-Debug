@@ -2,7 +2,7 @@ NAME
     Package::Debug - Add ENV/Config controlled debug tokens to your code
 
 VERSION
-    version 0.1.0
+    version 0.2.0
 
 SYNOPSIS
     There is a lot of code on "CPAN" that has something like this in it:
@@ -67,45 +67,6 @@ EXPECTED FEATURES
         In addition to package level granularity, global debugging can also
         be enabled, while still seeing the individual packages the debug
         message emanates from.
-
-PERFORMANCE
-    For the best speed,
-
-        use Package::Debug;
-
-    This will do its best to produce a "no-op" sub when debugging is not
-    requested by %ENV
-
-    However, this comes at a price, namely, if you want to turn on debugging
-    in code, you have to either
-
-        BEGIN {  $ENV{YOUR_PACKAGE_NAME_DEBUG} = 1 }
-        use Your::Package::Name;
-        # debugging is on
-
-    Or
-
-        BEGIN {  $Your::Package::Name::DEBUG = 1 }
-        use Your::Package::Name;
-        # debugging is on
-
-    And this will not work:
-
-        use Your::Package::Name;
-        $Your::Package::Name::DEBUG = 1; # Modification of Readonly value
-
-    This is because for the last example to work, the "DEBUG" sub would have
-    to check that value every time it was called.
-
-    And this will roughly double the cost of calling "DEBUG"
-
-  If you want run time adjustment
-        use Package::Debug runtime_switchable => 1;
-
-    This will
-
-    a - not make $DEBUG "readonly" during import.
-    b - inject a "DEBUG" "sub" that checks the value of the former.
 
 AUTHOR
     Kent Fredric <kentfredric@gmail.com>
