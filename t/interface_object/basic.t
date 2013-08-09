@@ -109,7 +109,7 @@ no_fatals "safe methods" => sub {
   call_value_is_ref( $i, 'debug_prefixed_lines', [], 'CODE' );
   call_value_is_ref( $i, 'debug_sub',            [], 'CODE' );
   call_value_is_ref( $i, 'debug_verbatim',       [], 'CODE' );
-  call_value_not_ok( $i, 'is_env_debugging',   [] );
+  call_value_not_ok( $i, 'is_env_debugging', [] );
 
 };
 
