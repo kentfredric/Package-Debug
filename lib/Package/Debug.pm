@@ -6,7 +6,7 @@ BEGIN {
   $Package::Debug::AUTHORITY = 'cpan:KENTNL';
 }
 {
-  $Package::Debug::VERSION = '0.1.0';
+  $Package::Debug::VERSION = '0.1.1';
 }
 
 # ABSTRACT: Add ENV/Config controlled debug tokens to your code
@@ -37,7 +37,7 @@ Package::Debug - Add ENV/Config controlled debug tokens to your code
 
 =head1 VERSION
 
-version 0.1.0
+version 0.1.1
 
 =head1 SYNOPSIS
 
