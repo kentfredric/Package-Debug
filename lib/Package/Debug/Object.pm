@@ -96,11 +96,13 @@ See L<< C<debug_styles>|/debug_styles >>
 =cut
 
 sub debug_style {
-    return $_[0]->{debug_style} if exists $_[0]->{debug_style};
-    return ( $_[0]->{debug_style} = 'prefixed_lines' );
+  return $_[0]->{debug_style} if exists $_[0]->{debug_style};
+  return ( $_[0]->{debug_style} = 'prefixed_lines' );
 }
+
 sub set_debug_style {
-    $_[0]->{debug_style} = $_[1]; return $_[0];
+  $_[0]->{debug_style} = $_[1];
+  return $_[0];
 }
 
 =method C<env_key_aliases>
@@ -116,11 +118,13 @@ A C<[]> of C<%ENV> keys that also should trigger debugging on this package.
 =cut
 
 sub env_key_aliases {
-    return $_[0]->{env_key_aliases} if exists $_[0]->{env_key_aliases};
-    return ( $_[0]->{env_key_aliases} = [] );
+  return $_[0]->{env_key_aliases} if exists $_[0]->{env_key_aliases};
+  return ( $_[0]->{env_key_aliases} = [] );
 }
+
 sub set_env_key_aliases {
-    $_[0]->{env_key_aliases} = $_[1]; return $_[0];
+  $_[0]->{env_key_aliases} = $_[1];
+  return $_[0];
 }
 
 =method C<env_key_prefix_style>
@@ -137,11 +141,13 @@ See  L<< C<env_key_prefix_styles>|/env_key_prefix_styles >>
 =cut
 
 sub env_key_prefix_style {
-    return $_[0]->{env_key_prefix_style} if exists $_[0]->{env_key_prefix_style};
-    return ( $_[0]->{env_key_prefix_style} = 'default' );
+  return $_[0]->{env_key_prefix_style} if exists $_[0]->{env_key_prefix_style};
+  return ( $_[0]->{env_key_prefix_style} = 'default' );
 }
+
 sub set_env_key_prefix_style {
-    $_[0]->{env_key_prefix_style} = $_[1]; return $_[0];
+  $_[0]->{env_key_prefix_style} = $_[1];
+  return $_[0];
 }
 
 =method C<env_key_style>
@@ -159,11 +165,13 @@ See L<< C<env_key_styles>|/env_key_styles >>
 =cut
 
 sub env_key_style {
-    return $_[0]->{env_key_style} if exists $_[0]->{env_key_style};
-    return ( $_[0]->{env_key_style} = 'default' );
+  return $_[0]->{env_key_style} if exists $_[0]->{env_key_style};
+  return ( $_[0]->{env_key_style} = 'default' );
 }
+
 sub set_env_key_style {
-    $_[0]->{env_key_style} = $_[1]; return $_[0];
+  $_[0]->{env_key_style} = $_[1];
+  return $_[0];
 }
 
 =method C<into>
@@ -185,11 +193,13 @@ See L<< C<auto_set_into>|/auto_set_into >>
 =cut
 
 sub into {
-    return $_[0]->{into} if exists $_[0]->{into};
-    die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()';
+  return $_[0]->{into} if exists $_[0]->{into};
+  die 'Cannot vivify ->into automatically, pass to constructor or ->set_into() or ->auto_set_into()';
 }
+
 sub set_into {
-    $_[0]->{into} = $_[1]; return $_[0];
+  $_[0]->{into} = $_[1];
+  return $_[0];
 }
 
 =method C<into_level>
@@ -208,11 +218,13 @@ See  L<< C<auto_set_into>|/auto_set_into >> for how to set C<into> sanely.
 =cut
 
 sub into_level {
-    return $_[0]->{into_level} if exists $_[0]->{into_level};
-    return ( $_[0]->{into_level} = 0 );
+  return $_[0]->{into_level} if exists $_[0]->{into_level};
+  return ( $_[0]->{into_level} = 0 );
 }
+
 sub set_into_level {
-    $_[0]->{into_level} = $_[1]; return $_[0];
+  $_[0]->{into_level} = $_[1];
+  return $_[0];
 }
 
 =method C<sub_name>
@@ -228,11 +240,13 @@ The name of the C<CODEREF> that will be installed into C<into>
 =cut
 
 sub sub_name {
-    return $_[0]->{sub_name} if exists $_[0]->{sub_name};
-    return ( $_[0]->{sub_name} = 'DEBUG' );
+  return $_[0]->{sub_name} if exists $_[0]->{sub_name};
+  return ( $_[0]->{sub_name} = 'DEBUG' );
 }
+
 sub set_sub_name {
-    $_[0]->{sub_name} = $_[1]; return $_[0];
+  $_[0]->{sub_name} = $_[1];
+  return $_[0];
 }
 
 =method C<value_name>
@@ -248,12 +262,15 @@ The name of the C<$SCALAR> that will be installed into C<into>
 =cut
 
 sub value_name {
-    return $_[0]->{value_name} if exists $_[0]->{value_name};
-    return ( $_[0]->{value_name} = 'DEBUG' );
+  return $_[0]->{value_name} if exists $_[0]->{value_name};
+  return ( $_[0]->{value_name} = 'DEBUG' );
 }
+
 sub set_value_name {
-    $_[0]->{value_name} = $_[1]; return $_[0];
+  $_[0]->{value_name} = $_[1];
+  return $_[0];
 }
+
 =method C<env_key>
 
 =method C<set_env_key>
@@ -278,7 +295,6 @@ Aka:
 
 =cut
 
-
 sub env_key {
   return $_[0]->{env_key} if exists $_[0]->{env_key};
   my $style = $_[0]->env_key_style;
@@ -287,9 +303,11 @@ sub env_key {
   }
   my $method = $env_key_styles{$style};
   return ( $_[0]->{env_key} = $_[0]->$method() );
-};
+}
+
 sub set_env_key {
-    $_[0]->{env_key} = $_[1]; return $_[0];
+  $_[0]->{env_key} = $_[1];
+  return $_[0];
 }
 
 =method C<env_key_prefix>
@@ -319,11 +337,14 @@ sub env_key_prefix {
     die "No such env_key_prefix_style $style, options are @{ keys %env_key_prefix_styles }";
   }
   my $method = $env_key_prefix_styles{$style};
-  return ( $_[0]->{env_key_prefix} =  $_[0]->$method() );
-};
-sub set_env_key_prefix {
-  $_[0]->{env_key_prefix} = $_[1]; return $_[0];
+  return ( $_[0]->{env_key_prefix} = $_[0]->$method() );
 }
+
+sub set_env_key_prefix {
+  $_[0]->{env_key_prefix} = $_[1];
+  return $_[0];
+}
+
 =method C<debug_sub>
 
 =method C<set_debug_sub>
@@ -340,16 +361,18 @@ Generated using L<< C<debug_style>|/debug_style >>
 =cut
 
 sub debug_sub {
-    return $_[0]->{debug_sub} if exists $_[0]->{debug_sub};
-    my $style = $_[0]->debug_style;
-    if ( not exists $debug_styles{$style} ) {
-        die "No such debug_style $style, options are @{ keys %debug_styles }";
-    }
-    my $method = $debug_styles{$style};
-    return ( $_[0]->{debug_sub} = $_[0]->$method() );
+  return $_[0]->{debug_sub} if exists $_[0]->{debug_sub};
+  my $style = $_[0]->debug_style;
+  if ( not exists $debug_styles{$style} ) {
+    die "No such debug_style $style, options are @{ keys %debug_styles }";
+  }
+  my $method = $debug_styles{$style};
+  return ( $_[0]->{debug_sub} = $_[0]->$method() );
 }
+
 sub set_debug_sub {
-    $_[0]->{debug_sub} = $_[1]; return $_[0];
+  $_[0]->{debug_sub} = $_[1];
+  return $_[0];
 }
 
 =method C<log_prefix_style>
@@ -368,13 +391,15 @@ See L<< C<log_prefix_styles>|/log_prefix_styles >>
 =cut
 
 sub log_prefix_style {
-    return $_[0]->{log_prefix_style} if exists $_[0]->{log_prefix_style};
-    my $style = 'short';
-    $style = $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE} if $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE};
-    return ( $_[0]->{log_prefix_style} = $style );
+  return $_[0]->{log_prefix_style} if exists $_[0]->{log_prefix_style};
+  my $style = 'short';
+  $style = $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE} if $ENV{PACKAGE_DEBUG_LOG_PREFIX_STYLE};
+  return ( $_[0]->{log_prefix_style} = $style );
 }
+
 sub set_log_prefix_style {
-    $_[0]->{log_prefix_style} = $_[1]; return $_[0];
+  $_[0]->{log_prefix_style} = $_[1];
+  return $_[0];
 }
 
 =method C<log_prefix>
@@ -402,9 +427,11 @@ sub log_prefix {
   }
   my $method = $log_prefix_styles{$style};
   return ( $_[0]->{log_prefix} = $_[0]->$method() );
-};
+}
+
 sub set_log_prefix {
-  $_[0]->{log_prefix} = $_[1]; return $_[0];
+  $_[0]->{log_prefix} = $_[1];
+  return $_[0];
 }
 
 =method C<is_env_debugging>
@@ -428,33 +455,42 @@ Instead, you should be modifying the value of C<$My::Package::Name::DEBUG>
 =cut
 
 sub is_env_debugging {
-    return $_[0]->{is_env_debugging} if exists $_[0]->{is_env_debugging};
-    if ( $ENV{PACKAGE_DEBUG_ALL} ) {
-        return ( $_[0]->{is_env_debugging} = 1 );
-    }
-    for my $key ( $_[0]->env_key, @{ $_[0]->env_key_aliases } ) {
-        next unless exists $ENV{$key};
-        next unless $ENV{$key};
-        return ( $_[0]->{is_env_debugging} = 1 );
-    }
-    return ( $_[0]->{is_env_debugging} = 0 );
+  return $_[0]->{is_env_debugging} if exists $_[0]->{is_env_debugging};
+  if ( $ENV{PACKAGE_DEBUG_ALL} ) {
+    return ( $_[0]->{is_env_debugging} = 1 );
+  }
+  for my $key ( $_[0]->env_key, @{ $_[0]->env_key_aliases } ) {
+    next unless exists $ENV{$key};
+    next unless $ENV{$key};
+    return ( $_[0]->{is_env_debugging} = 1 );
+  }
+  return ( $_[0]->{is_env_debugging} = 0 );
 }
+
 sub set_is_env_debugging {
-    $_[0]->{is_env_debugging} = $_[1];
-    return $_[0];
+  $_[0]->{is_env_debugging} = $_[1];
+  return $_[0];
 }
 
 =method C<into_stash>
 
+=method C<set_into_stash>
+
+=attr C<into_stash>
+
+Contains a L<< C<Package::Stash>|Package::Stash >> object for the target package.
+
 =cut
 
 sub into_stash {
-    return $_[0]->{into_stash} if exists $_[0]->{into_stash};
-    require Package::Stash;
-    return ( $_[0]->{into_stash} = Package::Stash->new( $_[0]->into ));
+  return $_[0]->{into_stash} if exists $_[0]->{into_stash};
+  require Package::Stash;
+  return ( $_[0]->{into_stash} = Package::Stash->new( $_[0]->into ) );
 }
+
 sub set_into_stash {
-    $_[0]->{into_stash} = $_[1]; return $_[0];
+  $_[0]->{into_stash} = $_[1];
+  return $_[0];
 }
 
 =method C<auto_set_into>
@@ -662,23 +698,24 @@ sub inject_debug_value {
   return if not defined $value_name;
   my $value = $_[0]->is_env_debugging;
   my $stash = $_[0]->into_stash;
-  if ( $stash->has_symbol('$' . $value_name) ) {
-    $value = $stash->get_symbol('$' . $value_name);
-    $stash->remove_symbol('$' . $value_name);
+  if ( $stash->has_symbol( q[$] . $value_name ) ) {
+    $value = $stash->get_symbol( q[$] . $value_name );
+    $stash->remove_symbol( q[$] . $value_name );
   }
-  $stash->add_symbol('$' . $value_name, \$value );
+  $stash->add_symbol( q[$] . $value_name, \$value );
+  return $_[0];
 }
 
 sub _wrap_debug_sub {
   my $sub_name = $_[0]->sub_name;
   return if not defined $sub_name;
-  my $value_name  = $_[0]->value_name;
+  my $value_name       = $_[0]->value_name;
   my $is_env_debugging = $_[0]->is_env_debugging;
   if ( not defined $value_name and not $is_env_debugging ) {
     return sub { };
   }
   my $real_debug = $_[0]->debug_sub;
-  my $symbol = $_[0]->into_stash->get_symbol('$' . $value_name );
+  my $symbol     = $_[0]->into_stash->get_symbol( q[$] . $value_name );
   return sub {
     return unless ${$symbol};
     goto $real_debug;
@@ -694,7 +731,8 @@ Injects the desired code reference C<DEBUG> symbol into the package determined b
 =cut
 
 sub inject_debug_sub {
-  $_[0]->into_stash->add_symbol( '&' . $_[0]->sub_name, $_[0]->_wrap_debug_sub );
+  $_[0]->into_stash->add_symbol( q[&] . $_[0]->sub_name, $_[0]->_wrap_debug_sub );
+  return $_[0];
 }
 
 1;
