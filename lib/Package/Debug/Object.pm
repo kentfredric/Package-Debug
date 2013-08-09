@@ -385,6 +385,8 @@ version 0.2.0
 
 =head2 C<into_stash>
 
+=head2 C<set_into_stash>
+
 =head2 C<auto_set_into>
 
 This method any plumbing will want to call.
@@ -652,6 +654,10 @@ B<NOTE:> This value I<BINDS> the first time it is evaluated, so for granular con
 you should not be lexically changing C<%ENV>.
 
 Instead, you should be modifying the value of C<$My::Package::Name::DEBUG>
+
+=head2 C<into_stash>
+
+Contains a L<< C<Package::Stash>|Package::Stash >> object for the target package.
 
 =head1 STYLES
 
