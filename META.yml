@@ -21,10 +21,10 @@ name: Package-Debug
 provides:
   Package::Debug:
     file: lib/Package/Debug.pm
-    version: v0.1.1
+    version: v0.2.0
   Package::Debug::Object:
     file: lib/Package/Debug/Object.pm
-    version: v0.1.1
+    version: v0.2.0
 requires:
   Package::Stash: 0
   perl: v5.10.0
@@ -34,7 +34,7 @@ resources:
   bugtracker: https://github.com/kentfredric/Package-Debug/issues
   homepage: https://github.com/kentfredric/Package-Debug
   repository: https://github.com/kentfredric/Package-Debug.git
-version: 0.1.1
+version: 0.2.0
 x_BuiltWith:
   modules:
     Capture::Tiny: 0.22

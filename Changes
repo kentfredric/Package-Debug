@@ -1,6 +1,6 @@
 Release history for Package-Debug
 
-0.1.1 2013-08-09T22:40:05Z
+0.2.0 2013-08-09T22:40:17Z
  [!Major]
  - runtime_switchable feature removed in favour of more general purpose
    code, that is performant even *with* runtime switchability being on by default.

@@ -17,7 +17,7 @@ my %module_build_args = (
     "Kent Fredric <kentfredric\@gmail.com>"
   ],
   "dist_name" => "Package-Debug",
-  "dist_version" => "0.1.1",
+  "dist_version" => "0.2.0",
   "license" => "perl",
   "module_name" => "Package::Debug",
   "recommends" => {},
