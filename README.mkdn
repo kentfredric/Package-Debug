@@ -4,7 +4,7 @@ Package::Debug - Add ENV/Config controlled debug tokens to your code
 
 # VERSION
 
-version 0.2.0
+version 0.2.1
 
 # SYNOPSIS
 
