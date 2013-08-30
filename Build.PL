@@ -23,7 +23,7 @@ my %module_build_args = (
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
-    "Package::Stash" => 0,
+    "Package::Stash" => "0.35",
     "perl" => "v5.10.0",
     "strict" => 0,
     "warnings" => 0
@@ -32,9 +32,9 @@ my %module_build_args = (
   "test_requires" => {
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::Fatal" => 0,
+    "Test::Fatal" => "0.010",
     "Test::More" => "0.98",
-    "Test::Output" => 0
+    "Test::Output" => "1.02"
   }
 );
 

@@ -6,9 +6,9 @@ build_requires:
   IO::Handle: 0
   IPC::Open3: 0
   Module::Build: 0.4007
-  Test::Fatal: 0
+  Test::Fatal: 0.010
   Test::More: 0.98
-  Test::Output: 0
+  Test::Output: 1.02
 configure_requires:
   Module::Build: 0.4007
 dynamic_config: 0
@@ -26,7 +26,7 @@ provides:
     file: lib/Package/Debug/Object.pm
     version: v0.2.1
 requires:
-  Package::Stash: 0
+  Package::Stash: 0.35
   perl: v5.10.0
   strict: 0
   warnings: 0
@@ -317,13 +317,41 @@ x_Dist_Zilla:
       name: '@Author::KENTNL/Prereqs::MatchInstalled'
       version: 0.1.1
     -
-      class: Dist::Zilla::Plugin::Prereqs
+      class: Dist::Zilla::Plugin::Prereqs::MatchInstalled
       config:
-        Dist::Zilla::Plugin::Prereqs:
-          phase: runtime
-          type: requires
-      name: Prereqs
-      version: 4.300037
+        Dist::Zilla::Plugin::Prereqs::MatchInstalled:
+          applyto:
+            - build.requires
+            - build.recommends
+            - build.suggests
+            - test.requires
+            - test.recommends
+            - test.suggests
+            - runtime.requires
+            - runtime.recommends
+            - runtime.suggests
+            - configure.requires
+            - configure.recommends
+            - configure.suggests
+            - develop.requires
+            - develop.recommends
+            - develop.suggests
+          applyto_phase:
+            - build
+            - test
+            - runtime
+            - configure
+            - develop
+          applyto_relation:
+            - requires
+            - recommends
+            - suggests
+          modules:
+            - Test::Output
+            - Package::Stash
+            - Test::Fatal
+      name: Prereqs::MatchInstalled
+      version: 0.1.1
     -
       class: Dist::Zilla::Plugin::FinderCode
       name: ':InstallModules'
