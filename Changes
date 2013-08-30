@@ -1,6 +1,8 @@
 Release history for Package-Debug
 
 {{$NEXT}}
+
+0.2.1 2013-08-30T21:04:58Z
  [!Minor]
  - Bump to get new Test::Compile
  - Increase deps on Test-essential things to try rule out weird silent
