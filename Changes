@@ -1,6 +1,22 @@
 Release history for Package-Debug
 
-0.2.1 2013-08-30T20:48:05Z
+0.2.1 2013-08-30T20:51:20Z
+ [!Minor]
+ - Bump to get new Test::Compile
+
+ [Dependencies::Added / develop requires]
+ - Test::Kwalitee 1.08
+
+ [Dependencies::Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.0 → v1.8.2
+
+ [Dependencies::Removed / test requires]
+ - Capture::Tiny
+ - blib
 
 0.2.0 2013-08-09T22:47:30Z
  [!Major]
