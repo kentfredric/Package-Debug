@@ -17,7 +17,7 @@ my %module_build_args = (
     "Kent Fredric <kentfredric\@gmail.com>"
   ],
   "dist_name" => "Package-Debug",
-  "dist_version" => "0.2.0",
+  "dist_version" => "0.2.1",
   "license" => "perl",
   "module_name" => "Package::Debug",
   "recommends" => {},
@@ -30,11 +30,11 @@ my %module_build_args = (
   },
   "script_files" => [],
   "test_requires" => {
-    "Capture::Tiny" => 0,
+    "IO::Handle" => 0,
+    "IPC::Open3" => 0,
     "Test::Fatal" => 0,
     "Test::More" => "0.98",
-    "Test::Output" => 0,
-    "blib" => 0
+    "Test::Output" => 0
   }
 );
 
