@@ -1,5 +1,32 @@
 Release history for Package-Debug
 
+0.2.1 2013-08-30T21:04:58Z
+ [!Minor]
+ - Bump to get new Test::Compile
+ - Increase deps on Test-essential things to try rule out weird silent
+   failures on a few targets
+
+ [Dependencies::Added / develop requires]
+ - Test::Kwalitee 1.08
+
+ [Dependencies::Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.0 → v1.8.2
+
+ [Dependencies::Changed / runtime requires]
+ - Package::Stash 0 → 0.35
+
+ [Dependencies::Changed / test requires]
+ - Test::Fatal 0 → 0.010
+ - Test::Output 0 → 1.02
+
+ [Dependencies::Removed / test requires]
+ - Capture::Tiny
+ - blib
+
 0.2.0 2013-08-09T22:47:30Z
  [!Major]
  - runtime_switchable feature removed in favour of more general purpose
