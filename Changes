@@ -1,5 +1,50 @@
 Release history for Package-Debug
 
+0.2.2 2013-09-26T06:54:05Z
+ [00 Minor]
+ - Rebuild to get latest Test::Compile to maybe avoid some Win32 bugs.
+
+ [Dependencies::Added / test requires]
+ - File::Spec
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.8.2 → v1.8.3
+
+ [Dependencies::Changed / runtime requires]
+ - Package::Stash 0.35 → 0.36
+
+ [Dependencies::Changed / test requires]
+ - Test::Fatal 0.010 → 0.013
+
+ [!Major]
+ - Noisiness of output during general usage reduced.
+ - Additional sanity checks in place to warn if anything that *would* be loaded via bootstrap, is unable to be bootstrapped due to wrong plugin order.
+ - Tests regenerated with newer toolkit.
+
+ [Dependencies::Added / develop requires]
+ - Test::CPAN::Changes 0.19
+ - Test::Kwalitee 1.08
+
+ [Dependencies::Added / runtime requires]
+ - lib
+
+ [Dependencies::Added / test requires]
+ - IO::Handle
+ - IPC::Open3
+
+ [Dependencies::Changed / build requires]
+ - Module::Build 0.4004 → 0.4007
+
+ [Dependencies::Changed / configure requires]
+ - Module::Build 0.4004 → 0.4007
+
+ [Dependencies::Changed / develop suggests]
+ - Dist::Zilla::PluginBundle::Author::KENTNL v1.7.2 → v1.8.3
+
+ [Dependencies::Removed / test requires]
+ - File::Find
+ - File::Temp
+
 0.2.1 2013-08-30T21:04:58Z
  [!Minor]
  - Bump to get new Test::Compile

@@ -6,7 +6,7 @@ BEGIN {
   $Package::Debug::Object::AUTHORITY = 'cpan:KENTNL';
 }
 {
-  $Package::Debug::Object::VERSION = '0.2.1';
+  $Package::Debug::Object::VERSION = '0.2.2';
 }
 
 # ABSTRACT: Object oriented guts to Package::Debug
@@ -349,7 +349,7 @@ Package::Debug::Object - Object oriented guts to Package::Debug
 
 =head1 VERSION
 
-version 0.2.1
+version 0.2.2
 
 =head1 METHODS
 
