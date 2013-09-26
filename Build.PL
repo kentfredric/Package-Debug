@@ -17,22 +17,23 @@ my %module_build_args = (
     "Kent Fredric <kentfredric\@gmail.com>"
   ],
   "dist_name" => "Package-Debug",
-  "dist_version" => "0.2.1",
+  "dist_version" => "0.2.2",
   "license" => "perl",
   "module_name" => "Package::Debug",
   "recommends" => {},
   "recursive_test_files" => 1,
   "requires" => {
-    "Package::Stash" => "0.35",
+    "Package::Stash" => "0.36",
     "perl" => "v5.10.0",
     "strict" => 0,
     "warnings" => 0
   },
   "script_files" => [],
   "test_requires" => {
+    "File::Spec" => 0,
     "IO::Handle" => 0,
     "IPC::Open3" => 0,
-    "Test::Fatal" => "0.010",
+    "Test::Fatal" => "0.013",
     "Test::More" => "0.98",
     "Test::Output" => "1.02"
   }

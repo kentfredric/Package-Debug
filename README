@@ -2,7 +2,7 @@ NAME
     Package::Debug - Add ENV/Config controlled debug tokens to your code
 
 VERSION
-    version 0.2.1
+    version 0.2.2
 
 SYNOPSIS
     There is a lot of code on "CPAN" that has something like this in it:
