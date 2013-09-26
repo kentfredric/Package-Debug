@@ -1,6 +1,8 @@
 Release history for Package-Debug
 
 {{$NEXT}}
+
+0.2.2 2013-09-26T06:54:05Z
  [00 Minor]
  - Rebuild to get latest Test::Compile to maybe avoid some Win32 bugs.
 
